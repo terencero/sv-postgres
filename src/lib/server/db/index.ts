@@ -13,3 +13,7 @@ export async function addPet(params: schema.InsertPetProfile) {
   console.log(`wtf: ${JSON.stringify(params)}`);
   await db.insert(schema.petProfile).values(params);
 }
+
+export async function getPets() {
+  return await db.select().from(schema.petProfile);
+}

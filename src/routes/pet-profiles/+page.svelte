@@ -1,54 +1,28 @@
 <script lang="ts">
+	import PetProfileForm from '$lib/components/PetProfileForm.svelte';
+
   let { data } = $props();
+  let showForm = $state(false);
 </script>
 <h1>Pet Profiles</h1>
+{#each data.pets as { id, name, petType, weight, dob, age } (id)}
+  <p>{name}</p>
+  <p>{petType}</p>
+  <p>Weight: {weight}</p>
+  <p>Date of Birth: {dob}</p>
+  <p>age: {age}</p>
+{/each}
 
-<div>
-  <h2>Create a Pet Profile</h2>
-  <form action="?/createPetProfile" method="POST">
-    <label>
-      name your pet
-      <input type="text" name="pet" />
-    </label>
-    <label>
-      What type of animal?
-      <input type="text" name="petType" />
-    </label>
-    <label>
-      pet age
-      <input type="text" name="age" />
-    </label>
-    <label>
-      date of birth
-      <input type="date" name="dob" />
-    </label>
-    <label>
-      weight
-      <input type="number" name="weight" />
-    </label>
-    <button aria-label="create pet profile">create pet profile</button>
-  </form>
-</div>
 
+<button onclick={() => showForm = !showForm}>
+  {#if showForm}
+    Hide Form
+  {:else}
+    Add a Pet
+  {/if}
+</button>
+{#if showForm}
+  <PetProfileForm />
+{/if}
 <style>
-  div {
-    display: flex;
-    flex-direction: column;
-  }
-  div > form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    width: 35vh;
-    label {
-      border: 1.5px solid blue;
-      input {
-        width: 80%;
-      }
-    }
-  }
-
-  button {
-    width: 50%;
-  }
 </style>

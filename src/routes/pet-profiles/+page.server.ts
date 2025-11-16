@@ -1,10 +1,12 @@
-import { addPet } from "$lib/server/db";
+import { addPet, getPets } from "$lib/server/db";
 import type { InsertPetProfile } from "$lib/server/db/schema";
 import { fail } from "@sveltejs/kit";
 
-export function load() {
-
-  // return result;
+export async function load() {
+  const pets = await getPets();
+  return {
+    pets,
+  }
 }
 
 export const actions = {
