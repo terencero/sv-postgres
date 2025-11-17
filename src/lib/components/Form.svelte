@@ -1,5 +1,18 @@
 <script lang="ts">
-  let { formFields } = $props();
+	import type { HTMLFormAttributes } from "svelte/elements";
+  
+  interface Field {
+    label: string;
+    type: HTMLInputElement['type'];
+    name: HTMLInputElement['name'];
+  }
+  export interface FormFields {
+    action: string;
+    method: HTMLFormAttributes['method'];
+    submitText: string;
+    fields: Field[];
+  }
+  let formFields: FormFields = $props();
 </script>
 <form action={formFields.action} method={formFields.method}>
   {#each formFields.fields as { label, type, name } (name)}

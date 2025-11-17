@@ -1,11 +1,17 @@
 <script lang="ts">
-	import Form from '$lib/components/Form.svelte';
+	import { page } from '$app/state';
+	import Form, { type FormFields } from '$lib/components/Form.svelte';
+	import type { HTMLFormAttributes } from 'svelte/elements';
 
+  // not sure why i can't just put the string directly in the formFields obj.
+  // somehow svelte knows that this one is a Constant when typed like this.
+  const method: HTMLFormAttributes['method'] = 'POST';
   let { data } = $props();
   let showForm = $state(false);
-  const formFields = {
-    action: 'createPetProfile',
-    method: 'POST',
+  const action = `${page.route.id}?/createPetProfile`
+  const formFields: FormFields = {
+    action,
+    method,
     submitText: 'create pet profile',
     fields: [
       { label: 'name your pet', type: 'text', name: 'pet' },
@@ -34,7 +40,7 @@
   {/if}
 </button>
 {#if showForm}
-  <Form {formFields} />
+  <Form {...formFields} />
 {/if}
 <style>
 </style>

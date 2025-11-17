@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1763402367018,
+      "tag": "0000_thick_terrax",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1763411438731,
+      "tag": "0001_mute_microbe",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1763411540997,
+      "tag": "0002_fat_vance_astro",
+      "breakpoints": true
+    }
+  ]
+}

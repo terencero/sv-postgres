@@ -1,5 +1,5 @@
 import { addPet, getPets } from "$lib/server/db";
-import type { InsertPetProfile } from "$lib/server/db/schema";
+import type { InsertPetProfiles } from "$lib/server/db/schema";
 import { fail } from "@sveltejs/kit";
 
 export async function load() {
@@ -11,7 +11,7 @@ export async function load() {
 
 export const actions = {
   createPetProfile: async ({ request }: { request: Request }) => {
-    type NewPet = InsertPetProfile;
+    type NewPet = InsertPetProfiles;
     const data = await request.formData();
     const params: NewPet = {
         name: data.get('pet')?.toString(),
@@ -24,9 +24,8 @@ export const actions = {
       await addPet(params);
     } catch (e) {
       return fail(422, {
-
+        message: `failed to create new pet profile: ${e}`,
       })
-      console.error(`failed to create new pet profile: ${e}`);
     }
   }
 };

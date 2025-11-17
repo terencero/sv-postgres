@@ -1,11 +1,18 @@
 import { relations } from 'drizzle-orm';
 import { pgTable, serial, integer, text, timestamp, date } from 'drizzle-orm/pg-core';
 
+const timestamps = {
+  updated_at: timestamp(),
+  created_at: timestamp().defaultNow().notNull(),
+  deleted_at: timestamp(),
+}
+
 export const user = pgTable('user', {
 	id: text('id').primaryKey(),
 	age: integer('age'),
 	username: text('username').notNull().unique(),
-	passwordHash: text('password_hash').notNull()
+	passwordHash: text('password_hash').notNull(),
+  ...timestamps,
 });
 
 export const session = pgTable('session', {
@@ -13,7 +20,8 @@ export const session = pgTable('session', {
 	userId: text('user_id')
 		.notNull()
 		.references(() => user.id),
-	expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'date' }).notNull()
+	expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'date' }).notNull(),
+  ...timestamps,
 });
 
 export const petProfiles = pgTable('pet', {
@@ -22,7 +30,8 @@ export const petProfiles = pgTable('pet', {
   age: integer('age'),
   dob: date('dob'),
   weight: integer('weight'),
-  name: text('name')
+  name: text('name'),
+  ...timestamps,
 });
 
 export const supplies = pgTable('supplies', {
@@ -30,7 +39,8 @@ export const supplies = pgTable('supplies', {
   supplyType: text('supply_type'),
   inventory: integer('inventory'),
   description: text('description'),
-  petId: text('pet_id')
+  petId: integer('pet_id'),
+  ...timestamps,
 });
 
 export const petProfileRelations = relations(petProfiles, ({ many }) => ({
