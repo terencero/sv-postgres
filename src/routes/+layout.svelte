@@ -13,6 +13,7 @@ import favicon from '$lib/assets/favicon.svg';
   <a href={resolve("/")}>Home</a>
   <a href={resolve("/about")}>About</a>
   <a href={resolve("/pet-profiles")}>My Pet(s)</a>
+  <a href={resolve("/supplies")}>Pet Supplies</a>
 </nav>
 <main>
  {@render children()}

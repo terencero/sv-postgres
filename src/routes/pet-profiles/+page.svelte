@@ -1,8 +1,20 @@
 <script lang="ts">
-	import PetProfileForm from '$lib/components/PetProfileForm.svelte';
+	import Form from '$lib/components/Form.svelte';
 
   let { data } = $props();
   let showForm = $state(false);
+  const formFields = {
+    action: 'createPetProfile',
+    method: 'POST',
+    submitText: 'create pet profile',
+    fields: [
+      { label: 'name your pet', type: 'text', name: 'pet' },
+      { label: 'What type of animal?', type: 'text', name: 'petType' },
+      { label: 'pet age', type: 'text', name: 'age' },
+      { label: 'date of birth', type: 'date', name: 'dob' },
+      { label: 'weight', type: 'number', name: 'weight' },
+    ],
+  }
 </script>
 <h1>Pet Profiles</h1>
 {#each data.pets as { id, name, petType, weight, dob, age } (id)}
@@ -22,7 +34,7 @@
   {/if}
 </button>
 {#if showForm}
-  <PetProfileForm />
+  <Form {formFields} />
 {/if}
 <style>
 </style>

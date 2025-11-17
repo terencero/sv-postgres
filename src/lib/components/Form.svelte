@@ -1,0 +1,31 @@
+<script lang="ts">
+  let { formFields } = $props();
+</script>
+<form action={formFields.action} method={formFields.method}>
+  {#each formFields.fields as { label, type, name } (name)}
+    <label>
+      {label}
+      <input {type} {name} />
+    </label>
+  {/each}
+  <button aria-label={formFields.submitText}>{formFields.submitText}</button>
+</form>
+
+<style>
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 35vh;
+    label {
+      border: 1.5px solid blue;
+      input {
+        width: 80%;
+      }
+    }
+  }
+
+  button {
+    width: 50%;
+  }
+</style>

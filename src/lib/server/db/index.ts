@@ -9,11 +9,10 @@ const client = neon(env.DATABASE_URL);
 
 export const db = drizzle(client, { schema });
 
-export async function addPet(params: schema.InsertPetProfile) {
-  console.log(`wtf: ${JSON.stringify(params)}`);
-  await db.insert(schema.petProfile).values(params);
+export async function addPet(params: schema.InsertPetProfiles) {
+  await db.insert(schema.petProfiles).values(params);
 }
 
 export async function getPets() {
-  return await db.select().from(schema.petProfile);
+  return await db.select().from(schema.petProfiles);
 }
