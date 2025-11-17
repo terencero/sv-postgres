@@ -38,7 +38,7 @@ export async function addSupply(params: schema.InsertSupplies) {
 
 export async function getSupplies() {
   try {
-    return await db.select().from(schema.supplies);
+    return await db.select().from(schema.supplies).orderBy(schema.supplies.petId);
   } catch (e) {
     console.error(`wtf: ${e}`);
     throw new Error('getSupplies failed');

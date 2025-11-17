@@ -23,13 +23,13 @@ export const actions = {
 
     try {
       const [ { id: petId } ] = await getPet(formFieldValues.petName);
-      console.log(`pet: ${petId}`)
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { petName, ...rest } = formFieldValues;
       const params: NewSupply = {
         petId,
         ...rest,
       }
+
       await addSupply(params);
     } catch (e) {
       return fail(422, {

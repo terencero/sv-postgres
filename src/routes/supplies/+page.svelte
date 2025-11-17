@@ -1,12 +1,12 @@
 <script lang="ts">
-	import Form, { type FormFields } from "$lib/components/Form.svelte";
-	import type { HTMLFormAttributes } from "svelte/elements";
+  import Form, { type FormFields } from "$lib/components/Form.svelte";
+  import type { HTMLFormAttributes } from "svelte/elements";
   import { page } from "$app/state";
+	import type { SelectSupplies } from "$lib/server/db/schema";
 
   let { data } = $props();
+  let showForm = $state(false);
 
-
-let showForm = $state(false);
   const method: HTMLFormAttributes['method'] = 'POST';
   // for some reason, defining this directly in the formFields obj always adds a trailing
   // slash after route id and before "?"
@@ -22,6 +22,19 @@ let showForm = $state(false);
       { label: 'Supply for:', type: 'text', name: 'petName' },
     ],
   }
+  type Supplies = Omit<SelectSupplies, "created_at" | "deleted_at" | "updated_at">;
+  interface PetSupplyMapping {
+    [idx: string]: Supplies[]; 
+  }
+  const petSupplyMapping = data.pets.reduce((acc: PetSupplyMapping, pet) => {
+    if (pet.name && !acc[pet.name]) {
+      acc[pet.name] = data.supplies.filter((supply) => supply.petId === pet.id);
+      
+      return acc;
+    }
+    
+    return acc;
+  }, {});
 </script>
 
 <h1>Pet Supplies</h1>
