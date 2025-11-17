@@ -35,3 +35,12 @@ export async function addSupply(params: schema.InsertSupplies) {
     throw new Error('addSupply failed');
   }
 }
+
+export async function getSupplies() {
+  try {
+    return await db.select().from(schema.supplies);
+  } catch (e) {
+    console.error(`wtf: ${e}`);
+    throw new Error('getSupplies failed');
+  }
+}

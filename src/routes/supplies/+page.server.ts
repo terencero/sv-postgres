@@ -1,6 +1,13 @@
-import { addSupply, getPet } from "$lib/server/db";
+import { addSupply, getPet, getSupplies } from "$lib/server/db";
 import type { InsertSupplies } from "$lib/server/db/schema"
 import { fail } from "@sveltejs/kit";
+
+export async function load() {
+  const supplies = await getSupplies();
+  return {
+    supplies,
+  }
+}
 
 export const actions = {
   addNewSupply: async ({ request }: { request: Request }) => {

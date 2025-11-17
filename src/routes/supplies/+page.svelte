@@ -3,6 +3,8 @@
 	import type { HTMLFormAttributes } from "svelte/elements";
   import { page } from "$app/state";
 
+  let { data } = $props();
+
 
 let showForm = $state(false);
   const method: HTMLFormAttributes['method'] = 'POST';
@@ -23,6 +25,13 @@ let showForm = $state(false);
 </script>
 
 <h1>Pet Supplies</h1>
+{#each data.supplies as { id, supplyType, inventory, description } (id) }
+  <div>
+    <p><b>Type:</b> {supplyType}</p>
+    <p><b>Inventory:</b> {inventory}</p>
+    <p><b>Description:</b> {description}</p>
+  </div>
+{/each}
 
 <button onclick={() => showForm = !showForm}>
   {#if showForm}
@@ -34,3 +43,17 @@ let showForm = $state(false);
 {#if showForm}
   <Form {...formFields} />
 {/if}
+
+<style>
+  div {
+    border: .2rem solid blue;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1.5rem;
+    p {
+      gap: 1rem;
+    }
+  }
+</style>

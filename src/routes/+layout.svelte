@@ -21,8 +21,9 @@ import favicon from '$lib/assets/favicon.svg';
 
 <style>
   nav {
+    display: flex;
     margin: 2rem 2rem 1rem;
-    gap: 2rem;
+    justify-content: space-evenly;
   }
   main {
     padding: 5rem;
