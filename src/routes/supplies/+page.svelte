@@ -22,10 +22,12 @@
       { label: 'Supply for:', type: 'text', name: 'petName' },
     ],
   }
+
   type Supplies = Omit<SelectSupplies, "created_at" | "deleted_at" | "updated_at">;
   interface PetSupplyMapping {
-    [idx: string]: Supplies[]; 
+    [key: string]: Supplies[]; 
   }
+
   const petSupplyMapping = data.pets.reduce((acc: PetSupplyMapping, pet) => {
     if (pet.name && !acc[pet.name]) {
       acc[pet.name] = data.supplies.filter((supply) => supply.petId === pet.id);
@@ -38,11 +40,16 @@
 </script>
 
 <h1>Pet Supplies</h1>
-{#each data.supplies as { id, supplyType, inventory, description } (id) }
+{#each Object.entries(petSupplyMapping) as [pet, supplies] (pet) }
   <div>
-    <p><b>Type:</b> {supplyType}</p>
-    <p><b>Inventory:</b> {inventory}</p>
-    <p><b>Description:</b> {description}</p>
+    {pet}
+    {#each supplies as supply (supply.id)}
+      <div>
+        <p><b>Supply Type:</b> {supply.supplyType}</p>
+        <p><b>Inventory:</b> {supply.inventory}</p>
+        <p><b>Description:</b> {supply.description}</p>
+      </div>
+    {/each}
   </div>
 {/each}
 

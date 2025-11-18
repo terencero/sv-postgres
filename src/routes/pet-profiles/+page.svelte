@@ -5,9 +5,10 @@
 
   // not sure why i can't just put the string directly in the formFields obj.
   // somehow svelte knows that this one is a Constant when typed like this.
-  const method: HTMLFormAttributes['method'] = 'POST';
   let { data } = $props();
   let showForm = $state(false);
+
+  const method: HTMLFormAttributes['method'] = 'POST';
   const action = `${page.route.id}?/createPetProfile`
   const formFields: FormFields = {
     action,
@@ -22,13 +23,17 @@
     ],
   }
 </script>
+
 <h1>Pet Profiles</h1>
+
 {#each data.pets as { id, name, petType, weight, dob, age } (id)}
-  <p>{name}</p>
-  <p>{petType}</p>
-  <p>Weight: {weight}</p>
-  <p>Date of Birth: {dob}</p>
-  <p>age: {age}</p>
+  <div>
+    <p>{name}</p>
+    <p>{petType}</p>
+    <p>Weight: {weight}</p>
+    <p>Date of Birth: {dob}</p>
+    <p>age: {age}</p>
+  </div>
 {/each}
 
 
@@ -39,8 +44,18 @@
     Add a Pet
   {/if}
 </button>
+
 {#if showForm}
   <Form {...formFields} />
 {/if}
+
 <style>
+  div {
+    border: .2rem solid blue;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1.5rem;
+  }
 </style>
