@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { pgTable, serial, integer, text, timestamp, date } from 'drizzle-orm/pg-core';
+import { pgTable, serial, integer, text, timestamp, date, time, boolean } from 'drizzle-orm/pg-core';
 
 const timestamps = {
   updated_at: timestamp(),
@@ -43,15 +43,36 @@ export const supplies = pgTable('supplies', {
   ...timestamps,
 });
 
+export const todos = pgTable('todos', {
+  id: serial().primaryKey(),
+  title: text('title'),
+  dueDate: date('due_date'),
+  dueTime: time('due_time'),
+  complete: boolean('complete'),
+  notes: text('notes'),
+  recurring: boolean('recurring'),
+  label: text('label'),
+  petId: integer('pet_id'),
+  ...timestamps,
+});
+
 export const petProfileRelations = relations(petProfiles, ({ many }) => ({
   supplies: many(supplies),
+  todos: many(todos),
 }));
 
 export const suppliesRelations = relations(supplies, ({ one }) => ({
   pet: one(petProfiles, {
     fields: [supplies.petId],
-    references: [petProfiles.id]
-  })
+    references: [petProfiles.id],
+  }),
+}));
+
+export const todosRelations = relations(todos, ({ one }) => ({
+  pet: one(petProfiles, {
+    fields: [todos.petId],
+    references: [petProfiles.id],
+  }),
 }))
 export type Session = typeof session.$inferSelect;
 
