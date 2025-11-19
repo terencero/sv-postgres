@@ -1,6 +1,13 @@
-import { addTodo, getPet } from "$lib/server/db";
+import { addTodo, getPet, getTodos } from "$lib/server/db";
 import type { InsertTodos } from "$lib/server/db/schema"
 import { fail } from "@sveltejs/kit";
+
+export async function load() {
+  const todos = await getTodos();
+  return {
+    todos,
+  };
+}
 
 export const actions = {
   addNewTodo: async ({ request }: { request: Request }) => {

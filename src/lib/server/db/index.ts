@@ -48,3 +48,12 @@ export async function getSupplies() {
 export async function addTodo(params: schema.InsertTodos) {
   await db.insert(schema.todos).values(params);
 }
+
+export async function getTodos() {
+  try {
+    return await db.select().from(schema.todos).orderBy(schema.todos.petId);
+  } catch (e) {
+    console.error(`wtf: ${e}`);
+    throw new Error('getTodos failed');
+  }
+}
