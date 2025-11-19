@@ -84,3 +84,5 @@ export type InsertPetProfiles = typeof petProfiles.$inferInsert;
 export type SelectSupplies = typeof supplies.$inferSelect;
 export type InsertSupplies = typeof supplies.$inferInsert;
 
+export type SelectTodos = typeof todos.$inferSelect;
+export type InsertTodos = typeof todos.$inferInsert;

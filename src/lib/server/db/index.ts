@@ -44,3 +44,7 @@ export async function getSupplies() {
     throw new Error('getSupplies failed');
   }
 }
+
+export async function addTodo(params: schema.InsertTodos) {
+  await db.insert(schema.todos).values(params);
+}

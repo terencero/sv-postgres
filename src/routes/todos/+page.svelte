@@ -6,13 +6,21 @@
   let showForm = $state(false);
 
   const method: HTMLFormAttributes['method'] = 'POST';
-  // TODO: create a server action
-  const action = `${page.route.id}?`;
+  const action = `${page.route.id}?/addNewTodo`;
   const formFields: FormFields = {
     action,
     method,
     submitText: 'Add a Todo',
-    fields: [],
+    fields: [
+      { label: 'Todo Title: ', type: 'text', name: 'title' },
+      { label: 'Due Date: ', type: 'date', name: 'dueDate' },
+      { label: 'Due Time: ', type: 'time', name: 'dueTime' },
+      { label: 'Done: ', type: 'checkbox', name: 'complete' },
+      { label: 'Repeats: ', type: 'checkbox', name: 'recurring' },
+      { label: 'Label: ', type: 'text', name: 'label' },
+      { label: 'Notes: ', type: 'text', name: 'notes' },
+      { label: 'For my pet: ', type: 'text', name: 'petName' },
+    ],
   };
 </script>
 
