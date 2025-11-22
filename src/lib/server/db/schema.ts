@@ -12,7 +12,7 @@ export const user = pgTable('user', {
 	age: integer('age'),
 	username: text('username').notNull().unique(),
 	passwordHash: text('password_hash').notNull(),
-  ...timestamps,
+  // ...timestamps,
 });
 
 export const session = pgTable('session', {
@@ -32,6 +32,7 @@ export const petProfiles = pgTable('pet', {
   dob: date('dob'),
   weight: integer('weight'),
   name: text('name'),
+  userId: text('user_id'),
   ...timestamps,
 });
 
@@ -57,7 +58,15 @@ export const todos = pgTable('todos', {
   ...timestamps,
 });
 
-export const petProfileRelations = relations(petProfiles, ({ many }) => ({
+export const userRelations = relations(user, ({ many }) => ({
+  petProfiles: many(petProfiles),
+}));
+
+export const petProfileRelations = relations(petProfiles, ({ one, many }) => ({
+  user: one(user, {
+    fields: [petProfiles.userId],
+    references: [user.id],
+  }),
   supplies: many(supplies),
   todos: many(todos),
 }));
@@ -74,10 +83,12 @@ export const todosRelations = relations(todos, ({ one }) => ({
     fields: [todos.petId],
     references: [petProfiles.id],
   }),
-}))
+}));
+
 export type Session = typeof session.$inferSelect;
 
 export type User = typeof user.$inferSelect;
+export type UserInsert = typeof user.$inferInsert;
 
 export type SelectPetProfiles = typeof petProfiles.$inferSelect;
 export type InsertPetProfiles = typeof petProfiles.$inferInsert;

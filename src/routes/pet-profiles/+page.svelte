@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import Form, { type FormFields } from '$lib/components/Form.svelte';
 	import type { HTMLFormAttributes } from 'svelte/elements';
@@ -26,28 +27,33 @@
 
 <h1>Pet Profiles</h1>
 
-{#each data.pets as { id, name, petType, weight, dob, age } (id)}
-  <div>
-    <p>{name}</p>
-    <p>{petType}</p>
-    <p>Weight: {weight}</p>
-    <p>Date of Birth: {dob}</p>
-    <p>age: {age}</p>
-  </div>
-{/each}
+{#if data.user }
+  {#each data.pets as { id, name, petType, weight, dob, age } (id)}
+    <div>
+      <p>{name}</p>
+      <p>{petType}</p>
+      <p>Weight: {weight}</p>
+      <p>Date of Birth: {dob}</p>
+      <p>age: {age}</p>
+    </div>
+  {/each}
 
 
-<button onclick={() => showForm = !showForm}>
+  <button onclick={() => showForm = !showForm}>
+    {#if showForm}
+      Hide Form
+    {:else}
+      Add a Pet
+    {/if}
+  </button>
+
   {#if showForm}
-    Hide Form
-  {:else}
-    Add a Pet
+    <Form {...formFields} />
   {/if}
-</button>
-
-{#if showForm}
-  <Form {...formFields} />
+  {:else}
+  <p><a href={resolve('/')}>Login or Register</a> to create and see your pet(s)!</p>
 {/if}
+
 
 <style>
   div {
