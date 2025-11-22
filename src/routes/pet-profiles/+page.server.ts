@@ -1,10 +1,10 @@
-import { addPet } from "$lib/server/db";
+import { addPet } from "$lib/server/pets";
 import type { InsertPetProfiles } from "$lib/server/db/schema";
-import { fail } from "@sveltejs/kit";
+import { fail, type RequestEvent } from "@sveltejs/kit";
 
 
 export const actions = {
-  createPetProfile: async ({ request }: { request: Request }) => {
+  createPetProfile: async ({ request }: RequestEvent) => {
     type NewPet = InsertPetProfiles;
     const data = await request.formData();
     const params: NewPet = {

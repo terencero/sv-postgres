@@ -1,2 +1,23 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script lang="ts">
+	import type { ActionData } from "./$types";
+	import { enhance } from '$app/forms';
+
+  let { form }: { form: ActionData } = $props();
+</script>
+
+<h1>Pet Dashboard</h1>
+
+<h1>Login/Register</h1>
+<form method="post" action="?/login" use:enhance>
+	<label>
+		Username
+		<input name="username" />
+	</label>
+	<label>
+		Password
+		<input type="password" name="password" />
+	</label>
+	<button>Login</button>
+	<button formaction="?/register">Register</button>
+</form>
+<p style="color: red">{form?.message ?? ''}</p>

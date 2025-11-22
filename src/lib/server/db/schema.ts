@@ -21,7 +21,8 @@ export const session = pgTable('session', {
 		.notNull()
 		.references(() => user.id),
 	expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'date' }).notNull(),
-  ...timestamps,
+  // TODO: get rid of timestamps for session or update the db queries?
+  // ...timestamps,
 });
 
 export const petProfiles = pgTable('pet', {

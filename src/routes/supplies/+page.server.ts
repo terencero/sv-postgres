@@ -1,4 +1,5 @@
-import { addSupply, getPet, getSupplies } from "$lib/server/db";
+import { addSupply, getSupplies } from "$lib/server/supplies";
+import { getPet } from "$lib/server/pets";
 import type { InsertSupplies } from "$lib/server/db/schema"
 import { fail } from "@sveltejs/kit";
 

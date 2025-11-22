@@ -13,7 +13,9 @@
     fields: Field[];
   }
   let formFields: FormFields = $props();
+  // TODO: user render props
 </script>
+
 <form action={formFields.action} method={formFields.method}>
   {#each formFields.fields as { label, type, name } (name)}
     <label>

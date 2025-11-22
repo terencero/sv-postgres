@@ -5,8 +5,9 @@
 	import type { HTMLFormAttributes } from "svelte/elements";
   import roundCheck from "$lib/assets/roundCheck.svg";
   import roundX from "$lib/assets/roundX.svg";
+	import type { PageProps } from "./$types";
   
-  let { data } = $props();
+  let { data, form }: PageProps = $props();
   let showForm = $state(false);
 
   const method: HTMLFormAttributes['method'] = 'POST';
@@ -47,7 +48,7 @@
 </script>
 
 <h1>Todos</h1>
-
+<span>message from form data: {form?.description}</span>
 {#each Object.entries(petTodoMapping) as [pet, todos] (pet) }
   <div>
     {pet}

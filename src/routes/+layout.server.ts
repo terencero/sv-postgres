@@ -1,4 +1,4 @@
-import { getPets } from "$lib/server/db";
+import { getPets } from "$lib/server/pets";
 
 export async function load() {
   const pets = await getPets();

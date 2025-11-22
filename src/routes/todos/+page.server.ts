@@ -1,4 +1,5 @@
-import { addTodo, getPet, getTodos } from "$lib/server/db";
+import { addTodo, getTodos } from "$lib/server/todos";
+import { getPet } from "$lib/server/pets";
 import type { InsertTodos } from "$lib/server/db/schema"
 import { fail } from "@sveltejs/kit";
 
