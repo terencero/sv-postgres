@@ -3,7 +3,7 @@ import type { LayoutServerLoad } from "./$types";
 
 export const load: LayoutServerLoad = async ({ locals }) => {
   if (locals.user) {
-    const pets = await getPets();
+    const pets = await getPets(locals.user.id);
     return {
       pets,
       user: locals.user.username,

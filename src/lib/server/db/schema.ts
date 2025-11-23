@@ -87,7 +87,7 @@ export const todosRelations = relations(todos, ({ one }) => ({
 
 export type Session = typeof session.$inferSelect;
 
-export type User = typeof user.$inferSelect;
+export type UserSelect = typeof user.$inferSelect;
 export type UserInsert = typeof user.$inferInsert;
 
 export type SelectPetProfiles = typeof petProfiles.$inferSelect;

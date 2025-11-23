@@ -48,7 +48,7 @@
   </button>
 
   {#if showForm}
-    <Form {...formFields} />
+    <Form userName={data.user} {...formFields} />
   {/if}
   {:else}
   <p><a href={resolve('/')}>Login or Register</a> to create and see your pet(s)!</p>

@@ -12,7 +12,8 @@
     submitText: string;
     fields: Field[];
   }
-  let formFields: FormFields = $props();
+
+  let { userName, ...formFields }: { userName: string } & FormFields = $props();
   // TODO: user render props
 </script>
 
@@ -23,6 +24,7 @@
       <input {type} {name} />
     </label>
   {/each}
+  <input type="hidden" name="userName" value={userName}>
   <button aria-label={formFields.submitText}>{formFields.submitText}</button>
 </form>
 
