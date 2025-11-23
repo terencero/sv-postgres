@@ -2,7 +2,7 @@
 	import type { HTMLFormAttributes } from "svelte/elements";
   
   interface Field {
-    label: string;
+    label?: string;
     type: HTMLInputElement['type'];
     name: HTMLInputElement['name'];
   }
@@ -13,18 +13,20 @@
     fields: Field[];
   }
 
-  let { userName, ...formFields }: { userName: string } & FormFields = $props();
-  // TODO: user render props
+  let formFields: FormFields = $props();
 </script>
 
 <form action={formFields.action} method={formFields.method}>
   {#each formFields.fields as { label, type, name } (name)}
-    <label>
-      {label}
+    {#if type === 'hidden'}
       <input {type} {name} />
-    </label>
+    {:else}
+      <label>
+        {label}
+        <input {type} {name} />
+      </label>
+    {/if}
   {/each}
-  <input type="hidden" name="userName" value={userName}>
   <button aria-label={formFields.submitText}>{formFields.submitText}</button>
 </form>
 

@@ -28,7 +28,7 @@
     [key: string]: Supplies[]; 
   }
 
-  const petSupplyMapping = data.pets.reduce((acc: PetSupplyMapping, pet) => {
+  const petSupplyMapping = (data.pets || []).reduce((acc: PetSupplyMapping, pet) => {
     if (pet.name && !acc[pet.name]) {
       acc[pet.name] = data.supplies.filter((supply) => supply.petId === pet.id);
       

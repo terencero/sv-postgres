@@ -21,6 +21,7 @@
       { label: 'pet age', type: 'text', name: 'age' },
       { label: 'date of birth', type: 'date', name: 'dob' },
       { label: 'weight', type: 'number', name: 'weight' },
+      { type: 'hidden', name: 'userName'},
     ],
   }
 </script>
@@ -48,7 +49,7 @@
   </button>
 
   {#if showForm}
-    <Form userName={data.user} {...formFields} />
+    <Form {...formFields} />
   {/if}
   {:else}
   <p><a href={resolve('/')}>Login or Register</a> to create and see your pet(s)!</p>

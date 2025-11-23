@@ -33,10 +33,7 @@
     [pet: string]: Todos[]
   }
 // TODO: extract this to a reusable function (supplies and todos)
-  // TODO: make a reusable component to map out the formFields into the completed form,
-  // that also accepts a prop to customize specific element text,
-  // i.e. the "Due Date: {date} at {time}"
-  const petTodoMapping = data.pets.reduce((acc: PetTodoMapping, pet) => {
+  const petTodoMapping = (data.pets || []).reduce((acc: PetTodoMapping, pet) => {
     if (pet.name && !acc[pet.name]) {
       acc[pet.name] = data.todos.filter((todo) => todo.petId === pet.id);
 
