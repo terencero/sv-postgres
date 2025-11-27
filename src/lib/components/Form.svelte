@@ -5,6 +5,8 @@
     label?: string;
     type: HTMLInputElement['type'];
     name: HTMLInputElement['name'];
+    value?: HTMLInputElement['value'];
+    el?: HTMLInputElement;
   }
   export interface FormFields {
     action: string;
@@ -17,13 +19,13 @@
 </script>
 
 <form action={formFields.action} method={formFields.method}>
-  {#each formFields.fields as { label, type, name } (name)}
+  {#each formFields.fields as { label, type, name, value = '', el = 'input' } (name)}
     {#if type === 'hidden'}
-      <input {type} {name} />
+      <input {type} {name} {value} />
     {:else}
       <label>
         {label}
-        <input {type} {name} />
+        <input {type} {name} {value} />
       </label>
     {/if}
   {/each}

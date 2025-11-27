@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { page } from "$app/state";
 	import Form, { type FormFields } from "$lib/components/Form.svelte";
-	import type { SelectTodos } from "$lib/server/db/schema";
+	import type { Todos } from "$lib/server/db/schema";
 	import type { HTMLFormAttributes } from "svelte/elements";
   import roundCheck from "$lib/assets/roundCheck.svg";
   import roundX from "$lib/assets/roundX.svg";
 	import type { PageProps } from "./$types";
+	import MappedPetItems from "$lib/components/MappedPetItems.svelte";
   
   let { data, form }: PageProps = $props();
   let showForm = $state(false);
@@ -21,35 +22,26 @@
       { label: 'Due Date: ', type: 'date', name: 'dueDate' },
       { label: 'Due Time: ', type: 'time', name: 'dueTime' },
       { label: 'Done: ', type: 'checkbox', name: 'complete' },
-      { label: 'Repeats: ', type: 'checkbox', name: 'recurring' },
+      { label: 'Repeats: ', type: 'dropdown', name: 'repeats' },
       { label: 'Label: ', type: 'text', name: 'label' },
       { label: 'Notes: ', type: 'text', name: 'notes' },
       { label: 'For my pet: ', type: 'text', name: 'petName' },
     ],
   };
 
-  type Todos = Omit<SelectTodos, "created_at" | "deleted_at" | "update_at">;
-  interface PetTodoMapping {
-    [pet: string]: Todos[]
-  }
-// TODO: extract this to a reusable function (supplies and todos)
-  const petTodoMapping = (data.pets || []).reduce((acc: PetTodoMapping, pet) => {
-    if (pet.name && !acc[pet.name]) {
-      acc[pet.name] = data.todos.filter((todo) => todo.petId === pet.id);
-
-      return acc;
-    }
-
-    return acc;
-  }, {});
 </script>
 
 <h1>Todos</h1>
 <span>message from form data: {form?.description}</span>
-{#each Object.entries(petTodoMapping) as [pet, todos] (pet) }
+<MappedPetItems
+  pets={data.pets || []}
+  items={data.todos || []}
+  {card}
+/>
+{#snippet card(pet: string, todos: Todos[])}
   <div>
     {pet}
-    {#each todos as todo (todo.id) }
+    {#each todos as todo (todo.id)}
       <div>
         <p><b>Title: </b>{todo.title}</p>
         <p><b>Due Date: </b>{todo.dueDate} at {todo.dueTime}</p>
@@ -61,7 +53,7 @@
           {/if}
         </p>
         <p><b>Repeats: </b>
-          {#if todo.recurring}
+          {#if todo.repeats}
             <img src={roundCheck} alt="round checkmark" />
           {:else}
             <img src={roundX} alt="round x mark" />
@@ -72,7 +64,8 @@
       </div>
     {/each}
   </div>
-{/each}
+{/snippet}
+
 
 <button onclick={() => showForm = !showForm}>
   {#if showForm}
