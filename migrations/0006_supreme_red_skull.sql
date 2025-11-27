@@ -1,0 +1,1 @@
+ALTER TABLE "todos" RENAME COLUMN "recurring" TO "repeats";

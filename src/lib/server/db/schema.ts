@@ -52,7 +52,7 @@ export const todos = pgTable('todos', {
   dueTime: time('due_time'),
   complete: boolean('complete'),
   notes: text('notes'),
-  recurring: boolean('recurring'),
+  repeats: text('repeats'),
   label: text('label'),
   petId: integer('pet_id'),
   ...timestamps,
@@ -94,7 +94,9 @@ export type SelectPetProfiles = typeof petProfiles.$inferSelect;
 export type InsertPetProfiles = typeof petProfiles.$inferInsert;
 
 export type SelectSupplies = typeof supplies.$inferSelect;
+export type Supplies = Omit<SelectSupplies, "created_at" | "deleted_at" | "update_at">;
 export type InsertSupplies = typeof supplies.$inferInsert;
 
 export type SelectTodos = typeof todos.$inferSelect;
+export type Todos = Omit<SelectTodos, "created_at" | "deleted_at" | "update_at">;
 export type InsertTodos = typeof todos.$inferInsert;
