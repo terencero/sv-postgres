@@ -6,7 +6,7 @@
     type: HTMLInputElement['type'];
     name: HTMLInputElement['name'];
     value?: HTMLInputElement['value'];
-    el?: HTMLInputElement;
+    selectOptions?: string[];
   }
   export interface FormFields {
     action: string;
@@ -19,13 +19,25 @@
 </script>
 
 <form action={formFields.action} method={formFields.method}>
-  {#each formFields.fields as { label, type, name, value = '', el = 'input' } (name)}
+  {#each formFields.fields as { label, type, name, value = '', selectOptions = [''] } (name)}
     {#if type === 'hidden'}
       <input {type} {name} {value} />
     {:else}
       <label>
         {label}
-        <input {type} {name} {value} />
+        {#if type === 'select'}
+          <select {name} {value}>
+            {#each selectOptions as option (option)}
+              <option value={option}>{option}</option>
+            {/each}
+          </select>
+        {:else if type === 'textarea'}
+          <textarea {name}>
+            {value}
+          </textarea>
+        {:else}
+          <input {type} {name} {value} />
+        {/if}
       </label>
     {/if}
   {/each}

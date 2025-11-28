@@ -22,9 +22,9 @@
       { label: 'Due Date: ', type: 'date', name: 'dueDate' },
       { label: 'Due Time: ', type: 'time', name: 'dueTime' },
       { label: 'Done: ', type: 'checkbox', name: 'complete' },
-      { label: 'Repeats: ', type: 'dropdown', name: 'repeats' },
+      { label: 'Repeats: ', type: 'select', name: 'repeats', selectOptions: ['daily', 'weekly', 'monthly', 'yearly'] },
       { label: 'Label: ', type: 'text', name: 'label' },
-      { label: 'Notes: ', type: 'text', name: 'notes' },
+      { label: 'Notes: ', type: 'textarea', name: 'notes' },
       { label: 'For my pet: ', type: 'text', name: 'petName' },
     ],
   };
@@ -32,12 +32,15 @@
 </script>
 
 <h1>Todos</h1>
+
 <span>message from form data: {form?.description}</span>
+
 <MappedPetItems
   pets={data.pets || []}
   items={data.todos || []}
   {card}
 />
+
 {#snippet card(pet: string, todos: Todos[])}
   <div>
     {pet}
@@ -66,7 +69,6 @@
   </div>
 {/snippet}
 
-
 <button onclick={() => showForm = !showForm}>
   {#if showForm}
     Hide Form
@@ -78,6 +80,7 @@
 {#if showForm}
   <Form {...formFields} />
 {/if}
+
 <style>
   div {
     border: .2rem solid blue;

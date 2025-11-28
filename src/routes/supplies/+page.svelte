@@ -2,7 +2,8 @@
   import Form, { type FormFields } from "$lib/components/Form.svelte";
   import type { HTMLFormAttributes } from "svelte/elements";
   import { page } from "$app/state";
-	import type { SelectSupplies } from "$lib/server/db/schema";
+	import type { Supplies } from "$lib/server/db/schema";
+	import MappedPetItems from "$lib/components/MappedPetItems.svelte";
 
   let { data } = $props();
   let showForm = $state(false);
@@ -19,28 +20,20 @@
       { label: 'What kind of supply? ex: food or litter', type: 'text', name: 'supplyType' },
       { label: 'How many or much?', type: 'number', name: 'inventory' },
       { label: 'Description ex: brand', type: 'text', name: 'description' },
-      { label: 'Supply for:', type: 'text', name: 'petName' },
+      { label: 'Supply for:', type: 'select', name: 'petName', selectOptions: (data.pets || []).map(({ name }) => name || '') },
     ],
   }
-
-  type Supplies = Omit<SelectSupplies, "created_at" | "deleted_at" | "updated_at">;
-  interface PetSupplyMapping {
-    [key: string]: Supplies[]; 
-  }
-
-  const petSupplyMapping = (data.pets || []).reduce((acc: PetSupplyMapping, pet) => {
-    if (pet.name && !acc[pet.name]) {
-      acc[pet.name] = data.supplies.filter((supply) => supply.petId === pet.id);
-      
-      return acc;
-    }
-    
-    return acc;
-  }, {});
 </script>
 
 <h1>Pet Supplies</h1>
-{#each Object.entries(petSupplyMapping) as [pet, supplies] (pet) }
+
+<MappedPetItems
+  pets={data.pets || []}
+  items={data.supplies || []}
+  {card}
+/>
+
+{#snippet card(pet: string, supplies: Supplies[])}
   <div>
     {pet}
     {#each supplies as supply (supply.id)}
@@ -51,7 +44,7 @@
       </div>
     {/each}
   </div>
-{/each}
+{/snippet}
 
 <button onclick={() => showForm = !showForm}>
   {#if showForm}
