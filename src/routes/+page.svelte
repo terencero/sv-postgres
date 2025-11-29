@@ -28,3 +28,10 @@ let { form, data }: PageProps = $props();
   </form>
   <p style="color: red">{form?.message ?? ''}</p>
 {/if}
+
+<h2>Upcoming:</h2>
+<ul>
+  {#each data.todosByUpcoming as todo (todo.id)}
+    <li>Title: {todo.title}, Due Date: {todo.dueDate}</li>
+  {/each}
+</ul>
