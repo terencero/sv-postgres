@@ -50,6 +50,20 @@
       "when": 1764026602835,
       "tag": "0006_supreme_red_skull",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1764452201652,
+      "tag": "0007_careless_gorilla_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1764452383413,
+      "tag": "0008_nice_kinsey_walden",
+      "breakpoints": true
     }
   ]
 }

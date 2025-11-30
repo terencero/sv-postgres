@@ -20,7 +20,7 @@ export const actions = {
       dueDate: String(data.get('dueDate')),
       dueTime: String(data.get('dueTime')),
       complete: Boolean(data.get('complete') ?? false),
-      recurring: Boolean(data.get('recurring') ?? false),
+      repeats: String(data.get('repeats')),
       label: String(data.get('label')),
       notes: String(data.get('notes')),
       petName: String(data.get('petName')).toLowerCase(),

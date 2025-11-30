@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { enhance } from "$app/forms";
 	import type { HTMLFormAttributes } from "svelte/elements";
   
   interface Field {
@@ -18,7 +19,7 @@
   let formFields: FormFields = $props();
 </script>
 
-<form action={formFields.action} method={formFields.method}>
+<form action={formFields.action} method={formFields.method} use:enhance>
   {#each formFields.fields as { label, type, name, value = '', selectOptions = [''] } (name)}
     {#if type === 'hidden'}
       <input {type} {name} {value} />

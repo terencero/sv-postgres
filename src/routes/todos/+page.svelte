@@ -28,7 +28,6 @@
       { label: 'For my pet: ', type: 'text', name: 'petName' },
     ],
   };
-
 </script>
 
 <h1>Todos</h1>

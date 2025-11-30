@@ -1,5 +1,5 @@
 import { getPets } from "$lib/server/pets";
-import { getTodos, getTodosByUpcoming } from "$lib/server/todos";
+import { getTodosByUpcoming } from "$lib/server/todos";
 import type { LayoutServerLoad } from "./$types";
 
 export const load: LayoutServerLoad = async ({ locals }) => {

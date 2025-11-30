@@ -14,7 +14,7 @@
     [pet: string]: Props['items'];
   }
 
-  const petItemsMapping = pets.reduce((acc: PetItemMapping, pet) => {
+  const petItemsMapping = $derived(pets.reduce((acc: PetItemMapping, pet) => {
     if (pet.name && !acc[pet.name]) {
       acc[pet.name] = items.filter((item) => item.petId === pet.id);
 
@@ -26,7 +26,7 @@
     }
 
     return acc;
-  }, {});
+  }, {}));
 </script>
 
 {#each Object.entries(petItemsMapping) as [pet, item] (pet) }

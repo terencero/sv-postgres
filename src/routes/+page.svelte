@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { PageProps } from "./$types";
 import { enhance } from '$app/forms';
+import Notifications from "$lib/components/Notifications.svelte";
 
 let { form, data }: PageProps = $props();
 </script>
@@ -30,8 +31,4 @@ let { form, data }: PageProps = $props();
 {/if}
 
 <h2>Upcoming:</h2>
-<ul>
-  {#each data.todosByUpcoming as todo (todo.id)}
-    <li>Title: {todo.title}, Due Date: {todo.dueDate}</li>
-  {/each}
-</ul>
+<Notifications data={data.todosByUpcoming} />

@@ -1,9 +1,13 @@
-import { desc, sql } from "drizzle-orm";
 import { db } from "./db";
 import { todos, type InsertTodos } from "./db/schema";
 
 export async function addTodo(params: InsertTodos) {
-  await db.insert(todos).values(params);
+  try {
+    await db.insert(todos).values(params);
+  } catch(e){
+    console.error(`addTodo failed: ${e}`);
+    throw new Error('addTodo failed');
+  }
 }
 
 export async function getTodos() {
@@ -15,10 +19,10 @@ export async function getTodos() {
   }
 }
 
-export async function getTodosByUpcoming() {
+export async function getTodosByUpcoming(limit = new Date()) {
   try {
     return await db.query.todos.findMany({
-      where: (todos, { lt }) => lt(todos.dueDate.getSQL(), new Date(2025, 10, 22)),
+      where: (todos, { lt }) => lt(todos.dueDate.getSQL(), limit),
       orderBy: (todos, { asc }) => asc(todos.dueDate),
     });
   } catch(e) {
