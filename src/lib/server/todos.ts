@@ -22,7 +22,7 @@ export async function getTodos() {
 export async function getTodosByUpcoming(limit = new Date()) {
   try {
     return await db.query.todos.findMany({
-      where: (todos, { lte }) => lte(todos.dueDate.getSQL(), limit),
+      where: (todos, { gte }) => gte(todos.dueDate.getSQL(), limit),
       orderBy: (todos, { asc }) => asc(todos.dueDate),
     });
   } catch(e) {
