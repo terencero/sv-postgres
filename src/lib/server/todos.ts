@@ -19,10 +19,13 @@ export async function getTodos() {
   }
 }
 
-export async function getTodosByUpcoming(limit = new Date()) {
+export async function getTodosByUpcoming(petId: number[], limit = new Date()) {
   try {
     return await db.query.todos.findMany({
-      where: (todos, { gte }) => gte(todos.dueDate.getSQL(), limit),
+      where: (todos, { gte, and, inArray }) => and(
+        gte(todos.dueDate.getSQL(), limit),
+        inArray(todos.petId, petId)
+      ),
       orderBy: (todos, { asc }) => asc(todos.dueDate),
     });
   } catch(e) {

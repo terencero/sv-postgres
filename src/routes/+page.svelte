@@ -31,4 +31,4 @@ let { form, data }: PageProps = $props();
 {/if}
 
 <h2>Upcoming:</h2>
-<Notifications data={data.todosByUpcoming} />
+<Notifications data={data.todosByUpcoming || []} pets={data.pets || []} />
