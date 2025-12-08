@@ -46,7 +46,7 @@ export const supplies = pgTable('supplies', {
 });
 
 export const todos = pgTable('todos', {
-  id: serial().primaryKey(),
+  id: serial().primaryKey().notNull(),
   title: text('title'),
   dueDate: date('due_date'),
   dueTime: time('due_time'),

@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { todos, type InsertTodos } from "./db/schema";
 
@@ -7,6 +8,16 @@ export async function addTodo(params: InsertTodos) {
   } catch(e){
     console.error(`addTodo failed: ${e}`);
     throw new Error('addTodo failed');
+  }
+}
+
+export async function updateTodo(params: InsertTodos) {
+  try {
+    const todo = await db.update(todos).set({id: params.id}).where(eq(todos.id, params.id || 1)).returning();
+    return todo;
+  } catch (e) {
+    console.error(`updateTodo failed: ${e}`)
+    throw new Error('updateTodo failed');
   }
 }
 
@@ -27,6 +38,9 @@ export async function getTodosByUpcoming(petId: number[], limit = new Date()) {
         inArray(todos.petId, petId)
       ),
       orderBy: (todos, { asc }) => asc(todos.dueDate),
+      with: {
+        pet: true,
+      },
     });
   } catch(e) {
     console.error(`failed to get todosByUpcoming: ${e}`);

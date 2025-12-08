@@ -7,9 +7,22 @@
   import roundX from "$lib/assets/roundX.svg";
 	import type { PageProps } from "./$types";
 	import MappedPetItems from "$lib/components/MappedPetItems.svelte";
+	import { SvelteSet } from "svelte/reactivity";
   
+  const FormTypes = {
+    create: {
+      method: 'POST',
+      action: `${page.route.id}?/addNewTodo`,
+    },
+    update: {
+      method: 'POST',
+      action: `${page.route.id}?/addNewTodo`,
+    }
+  } as const
+
   let { data, form }: PageProps = $props();
-  let showForm = $state(false);
+  let showCreateForm = $state(false);
+  let showUpdateForm = new SvelteSet<number>();
 
   const method: HTMLFormAttributes['method'] = 'POST';
   const action = `${page.route.id}?/addNewTodo`;
@@ -28,6 +41,14 @@
       { label: 'For my pet: ', type: 'text', name: 'petName' },
     ],
   };
+
+  const handleEditClick = (todoId: number) => {
+    if (showUpdateForm.has(todoId)) {
+      showUpdateForm.delete(todoId);
+    } else {
+      showUpdateForm.add(todoId);
+    }
+  }
 </script>
 
 <h1>Todos</h1>
@@ -44,7 +65,7 @@
   <div>
     {pet}
     {#each todos as todo (todo.id)}
-      <div>
+      <div id={`${String(todo.id)}-${todo.title}`}>
         <p><b>Title: </b>{todo.title}</p>
         <p><b>Due Date: </b>{todo.dueDate} at {todo.dueTime}</p>
         <p><b>Done: </b>
@@ -54,44 +75,46 @@
             <img src={roundX} alt="round x mark">
           {/if}
         </p>
-        <p><b>Repeats: </b>
-          {#if todo.repeats}
-            <img src={roundCheck} alt="round checkmark" />
-          {:else}
-            <img src={roundX} alt="round x mark" />
-          {/if}
-        </p>
+        <p><b>Repeats: </b>{todo.repeats || "once"}</p>
         <p><b>Label: </b>{todo.label}</p>
         <p><b>Notes: </b>{todo.notes}</p>
+        <button onclick={() => handleEditClick(todo.id)}>
+          {showUpdateForm.has(todo.id) ? 'hide' : 'edit'}
+        </button>
+        {#if showUpdateForm.has(todo.id)}
+          <Form {...formFields} />
+        {/if}
       </div>
     {/each}
   </div>
 {/snippet}
 
-<button onclick={() => showForm = !showForm}>
-  {#if showForm}
+<button onclick={() => showCreateForm = !showCreateForm}>
+  {#if showCreateForm}
     Hide Form
   {:else}
     Add a Todo
   {/if}
 </button>
 
-{#if showForm}
+{#if showCreateForm}
   <Form {...formFields} />
 {/if}
 
 <style>
   div {
     border: .2rem solid blue;
+    border-radius: 1.5%;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: .2rem;
     margin-bottom: 1rem;
     padding: 1.5rem;
     p {
       display: flex;
       gap: 1rem;
       align-items: center;
+      margin: 0;
     }
   }
   img {

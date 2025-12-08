@@ -18,7 +18,7 @@ export const actions = {
     const formFieldValues = {
       title: String(data.get('title')),
       dueDate: String(data.get('dueDate')),
-      dueTime: String(data.get('dueTime')),
+      dueTime: String(data.get('dueTime')) || null,
       complete: Boolean(data.get('complete') ?? false),
       repeats: String(data.get('repeats')),
       label: String(data.get('label')),
@@ -30,6 +30,7 @@ export const actions = {
       const [ { id: petId } ] = await getPet(formFieldValues.petName);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { petName, ...rest } = formFieldValues;
+      console.log(`pet id: ${petId}`)
       const params: NewTodo = {
         petId,
         ...rest,
