@@ -16,7 +16,7 @@
     },
     update: {
       method: 'POST',
-      action: `${page.route.id}?/addNewTodo`,
+      action: `${page.route.id}?/updateTodo`,
     }
   } as const
 
@@ -26,9 +26,9 @@
 
   const method: HTMLFormAttributes['method'] = 'POST';
   const action = `${page.route.id}?/addNewTodo`;
-  const formFields: FormFields = {
-    action,
-    method,
+  const formFields = {
+    // action,
+    // method,
     submitText: 'Add a Todo',
     fields: [
       { label: 'Todo Title: ', type: 'text', name: 'title' },
@@ -82,7 +82,11 @@
           {showUpdateForm.has(todo.id) ? 'hide' : 'edit'}
         </button>
         {#if showUpdateForm.has(todo.id)}
-          <Form {...formFields} />
+          <Form
+            data={todo}
+            {...FormTypes.update}
+            {...formFields}
+          />
         {/if}
       </div>
     {/each}
@@ -98,7 +102,7 @@
 </button>
 
 {#if showCreateForm}
-  <Form {...formFields} />
+  <Form {...FormTypes.create} {...formFields} />
 {/if}
 
 <style>

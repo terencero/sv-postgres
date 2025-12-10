@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from "$app/forms";
+	import type { Todos } from "$lib/server/db/schema";
 	import type { HTMLFormAttributes } from "svelte/elements";
   
   interface Field {
@@ -16,11 +17,12 @@
     fields: Field[];
   }
 
-  let formFields: FormFields = $props();
+  type FormProps = FormFields & { data?: Todos };
+  let formData: FormProps = $props();
 </script>
 
-<form action={formFields.action} method={formFields.method} use:enhance>
-  {#each formFields.fields as { label, type, name, value = '', selectOptions = [''] } (name)}
+<form action={formData.action} method={formData.method} use:enhance>
+  {#each formData.fields as { label, type, name, value = formData.data?.[name as keyof Todos] || '', selectOptions = [''] } (name)}
     {#if type === 'hidden'}
       <input {type} {name} {value} />
     {:else}
@@ -42,7 +44,7 @@
       </label>
     {/if}
   {/each}
-  <button aria-label={formFields.submitText}>{formFields.submitText}</button>
+  <button aria-label={formData.submitText}>{formData.submitText}</button>
 </form>
 
 <style>
