@@ -1,4 +1,4 @@
-import { addTodo, getTodos } from "$lib/server/todos";
+import { addTodo, getTodos, updateTodo } from "$lib/server/todos";
 import { getPet } from "$lib/server/pets";
 import type { InsertTodos } from "$lib/server/db/schema"
 import { fail } from "@sveltejs/kit";
@@ -37,6 +37,35 @@ export const actions = {
       };
 
       await addTodo(params);
+    } catch (e) {
+      return fail(422, {
+        description: `not sure what this is ${e}`,
+        error: e.message,
+      });
+    }
+  },
+  updateTodo: async ({ request }: { request: Request }) => {
+    type UpdatedTodo = InsertTodos;
+
+    const data = await request.formData();
+    const formFieldValues = {
+      title: String(data.get('title')),
+      dueDate: String(data.get('dueDate')),
+      dueTime: String(data.get('dueTime')) || null,
+      complete: Boolean(data.get('complete') ?? false),
+      repeats: String(data.get('repeats')),
+      label: String(data.get('label')),
+      notes: String(data.get('notes')),
+      petName: String(data.get('petName')).toLowerCase(),
+      id: Number(data.get('id')),
+    };
+
+    try {
+      const params: UpdatedTodo = {
+        ...formFieldValues,
+      };
+
+      await updateTodo(params);
     } catch (e) {
       return fail(422, {
         description: `not sure what this is ${e}`,

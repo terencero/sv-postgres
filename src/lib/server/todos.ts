@@ -13,6 +13,7 @@ export async function addTodo(params: InsertTodos) {
 
 export async function updateTodo(params: InsertTodos) {
   try {
+    // TODO: send the right params to set();
     const todo = await db.update(todos).set({id: params.id}).where(eq(todos.id, params.id || 1)).returning();
     return todo;
   } catch (e) {

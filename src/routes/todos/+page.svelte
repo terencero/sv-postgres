@@ -24,13 +24,7 @@
   let showCreateForm = $state(false);
   let showUpdateForm = new SvelteSet<number>();
 
-  const method: HTMLFormAttributes['method'] = 'POST';
-  const action = `${page.route.id}?/addNewTodo`;
-  const formFields = {
-    // action,
-    // method,
-    submitText: 'Add a Todo',
-    fields: [
+  const formFields = [
       { label: 'Todo Title: ', type: 'text', name: 'title' },
       { label: 'Due Date: ', type: 'date', name: 'dueDate' },
       { label: 'Due Time: ', type: 'time', name: 'dueTime' },
@@ -39,8 +33,7 @@
       { label: 'Label: ', type: 'text', name: 'label' },
       { label: 'Notes: ', type: 'textarea', name: 'notes' },
       { label: 'For my pet: ', type: 'text', name: 'petName' },
-    ],
-  };
+    ];
 
   const handleEditClick = (todoId: number) => {
     if (showUpdateForm.has(todoId)) {
@@ -85,7 +78,8 @@
           <Form
             data={todo}
             {...FormTypes.update}
-            {...formFields}
+            fields={[{ label: 'id: ', type: 'hidden', name: 'id', value: String(todo.id) }, ...formFields]}
+            submitText='edit'
           />
         {/if}
       </div>
@@ -102,7 +96,11 @@
 </button>
 
 {#if showCreateForm}
-  <Form {...FormTypes.create} {...formFields} />
+  <Form
+    {...FormTypes.create}
+    fields={formFields}
+    submitText='Add a Todo'
+  />
 {/if}
 
 <style>
