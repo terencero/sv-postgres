@@ -13,8 +13,8 @@ export async function addTodo(params: InsertTodos) {
 
 export async function updateTodo(params: InsertTodos) {
   try {
-    // TODO: send in updated timestamp here?
-    const todo = await db.update(todos).set(params).where(eq(todos.id, params.id || 1)).returning();
+    const updatedAt: InsertTodos['updated_at'] = new Date();
+    const todo = await db.update(todos).set({ updated_at: updatedAt, ...params }).where(eq(todos.id, params.id || 1)).returning();
     return todo;
   } catch (e) {
     console.error(`updateTodo failed: ${e}`)
