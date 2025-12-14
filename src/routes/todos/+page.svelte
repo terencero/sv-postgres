@@ -2,12 +2,12 @@
 	import { page } from "$app/state";
 	import Form, { type FormFields } from "$lib/components/Form.svelte";
 	import type { Todos } from "$lib/server/db/schema";
-	import type { HTMLFormAttributes } from "svelte/elements";
-  import roundCheck from "$lib/assets/roundCheck.svg";
+	import roundCheck from "$lib/assets/roundCheck.svg";
   import roundX from "$lib/assets/roundX.svg";
 	import type { PageProps } from "./$types";
 	import MappedPetItems from "$lib/components/MappedPetItems.svelte";
 	import { SvelteSet } from "svelte/reactivity";
+	import { enhance } from "$app/forms";
   
   const FormTypes = {
     create: {
@@ -24,7 +24,7 @@
   let showCreateForm = $state(false);
   let showUpdateForm = new SvelteSet<number>();
 
-  const formFields = [
+  const formFields: FormFields['fields'] = [
       { label: 'Todo Title: ', type: 'text', name: 'title' },
       { label: 'Due Date: ', type: 'date', name: 'dueDate' },
       { label: 'Due Time: ', type: 'time', name: 'dueTime' },
@@ -59,18 +59,27 @@
     {pet}
     {#each todos as todo (todo.id)}
       <div id={`${String(todo.id)}-${todo.title}`}>
-        <p><b>Title: </b>{todo.title}</p>
-        <p><b>Due Date: </b>{todo.dueDate} at {todo.dueTime}</p>
-        <p><b>Done: </b>
-          {#if todo.complete}
-            <img src={roundCheck} alt="round checkmark">
-          {:else}
-            <img src={roundX} alt="round x mark">
-          {/if}
-        </p>
-        <p><b>Repeats: </b>{todo.repeats || "once"}</p>
-        <p><b>Label: </b>{todo.label}</p>
-        <p><b>Notes: </b>{todo.notes}</p>
+        <form method="POST" action="?/completeTodo" use:enhance>
+          <input type="hidden" name="id" value={todo.id} />
+          <p><b>Title: </b>{todo.title}</p>
+          <p><b>Due Date: </b>{todo.dueDate} at {todo.dueTime}</p>
+          <p><b>Done: </b>
+            <input type="hidden" name="complete" value={!todo.complete} />
+            {#if todo.complete}
+              <img src={roundCheck} alt="round checkmark">
+            {:else}
+              <img src={roundX} alt="round x mark">
+            {/if}
+          </p>
+          <p><b>Repeats: </b>{todo.repeats || "once"}</p>
+          <p><b>Label: </b>{todo.label}</p>
+          <p><b>Notes: </b>{todo.notes}</p>
+          <button aria-label="Mark Complete">Mark Complete</button>
+        </form>
+        <form method="POST" action="?/deleteTodo">
+          <input type="hidden" name="id" value={todo.id} />
+          <button aria-label="Delete">Delete</button>
+        </form>
         <button onclick={() => handleEditClick(todo.id)}>
           {showUpdateForm.has(todo.id) ? 'hide' : 'edit'}
         </button>

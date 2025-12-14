@@ -47,3 +47,11 @@ export async function getTodosByUpcoming(petId: number[], limit = new Date()) {
     console.error(`failed to get todosByUpcoming: ${e}`);
   }
 }
+
+export async function deleteTodo(id: number) {
+  try {
+    return await db.delete(todos).where(eq(todos.id, id));
+  } catch(e) {
+    console.error(`failed to delete todo: ${e}`);
+  }
+}
