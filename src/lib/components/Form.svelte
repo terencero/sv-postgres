@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { enhance } from "$app/forms";
-	import type { Todos } from "$lib/server/db/schema";
+	import type { Supplies, Todos } from "$lib/server/db/schema";
 	import type { HTMLFormAttributes } from "svelte/elements";
   
   interface Field {
@@ -17,12 +17,13 @@
     fields: Field[];
   }
 
-  type FormProps = FormFields & { data?: Todos };
+  type FormData = Todos | Supplies;
+  type FormProps = FormFields & { data?: FormData };
   let formData: FormProps = $props();
 </script>
 
 <form action={formData.action} method={formData.method} use:enhance>
-  {#each formData.fields as { label, type, name, value = formData.data?.[name as keyof Todos] || '', selectOptions = [''] } (name)}
+  {#each formData.fields as { label, type, name, value = formData.data?.[name as keyof (Todos | Supplies)] || '', selectOptions = [''] } (name)}
     {#if type === 'hidden'}
       <input {type} {name} {value} />
     {:else}

@@ -1,5 +1,6 @@
+import { eq } from "drizzle-orm";
 import { db } from "./db";
-import { supplies, type InsertSupplies } from "./db/schema";
+import { supplies, type InsertSupplies, type Supplies } from "./db/schema";
 
 export async function addSupply(params: InsertSupplies) {
   try {
@@ -19,3 +20,11 @@ export async function getSupplies() {
   }
 }
 
+export async function deleteSupply(params: Supplies['id']) {
+  try {
+    return await db.delete(supplies).where(eq(supplies.id, params))
+  } catch(e) {
+    console.error(`wtf: ${e}`);
+    throw new Error('getSupplies failed');
+  }
+}

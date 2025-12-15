@@ -4,6 +4,7 @@
   import { page } from "$app/state";
 	import type { Supplies } from "$lib/server/db/schema";
 	import MappedPetItems from "$lib/components/MappedPetItems.svelte";
+	import { enhance } from "$app/forms";
 
   let { data } = $props();
   let showForm = $state(false);
@@ -38,9 +39,15 @@
     {pet}
     {#each supplies as supply (supply.id)}
       <div>
-        <p><b>Supply Type:</b> {supply.supplyType}</p>
-        <p><b>Inventory:</b> {supply.inventory}</p>
-        <p><b>Description:</b> {supply.description}</p>
+        <form action="?/deleteSupply" method="POST" use:enhance>
+          <input type="hidden" name="id" value={supply.id}>
+
+          <p><b>Supply Type:</b> {supply.supplyType}</p>
+          <p><b>Inventory:</b> {supply.inventory}</p>
+          <p><b>Description:</b> {supply.description}</p>
+
+          <button aria-label="Delete Supply">Delete Supply</button>
+        </form>
       </div>
     {/each}
   </div>
