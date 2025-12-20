@@ -4,7 +4,7 @@ import { supplies, type InsertSupplies, type Supplies } from "./db/schema";
 
 export async function addSupply(params: InsertSupplies) {
   try {
-    return await db.insert(supplies).values(params);
+    return await db.insert(supplies).values(params).returning();
   } catch (e) {
     console.error(`wtf: ${e}`);
     throw new Error('addSupply failed');

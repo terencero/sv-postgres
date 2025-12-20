@@ -32,7 +32,13 @@ export const actions = {
         ...rest,
       }
 
-      await addSupply(params);
+      const [newSupply] = await addSupply(params);
+
+      return {
+        success: true,
+        supplyId: newSupply.id,
+        actionType: 'addSupply',
+      };
     } catch (e) {
       return fail(422, {
         description: data.get('description'),
@@ -67,7 +73,7 @@ export const actions = {
       return {
         success: true,
         supplyId: updatedSupplyItem.id,
-        type: 'updateSupply',
+        actionType: 'updateSupply',
       };
     } catch(e) {
       return fail(422, {
