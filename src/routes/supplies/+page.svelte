@@ -1,33 +1,49 @@
 <script lang="ts">
   import Form, { type FormFields } from "$lib/components/Form.svelte";
-  import type { HTMLFormAttributes } from "svelte/elements";
   import { page } from "$app/state";
 	import type { Supplies } from "$lib/server/db/schema";
 	import MappedPetItems from "$lib/components/MappedPetItems.svelte";
 	import { enhance } from "$app/forms";
+	import { SvelteSet } from "svelte/reactivity";
 
-  let { data } = $props();
-  let showForm = $state(false);
+  let { data, form } = $props();
+  let showCreateForm = $state(false);
+  let showUpdateForm = new SvelteSet<number>();
 
-  const method: HTMLFormAttributes['method'] = 'POST';
-  // for some reason, defining this directly in the formFields obj always adds a trailing
-  // slash after route id and before "?"
-  const action = `${page.route.id}?/addNewSupply`;
-  let formFields: FormFields = {
-    action,
-    method,
-    submitText: 'Add a Supply',
-    fields: [
+  const FormTypes = {
+    create: {
+      method: 'POST',
+      action: `${page.route.id}?/addNewSupply`,
+    },
+    update: {
+      method: 'POST',
+      action: `${page.route.id}?/updateSupply`,
+    }
+  } as const
+
+  let formFields: FormFields['fields'] = [
       { label: 'What kind of supply? ex: food or litter', type: 'text', name: 'supplyType' },
       { label: 'How many or much?', type: 'number', name: 'inventory' },
-      { label: 'Description ex: brand', type: 'text', name: 'description' },
+      { label: 'Description ex: jrand', type: 'text', name: 'description' },
       { label: 'Supply for:', type: 'select', name: 'petName', selectOptions: (data.pets || []).map(({ name }) => name || '') },
-    ],
+    ];
+
+  const handleEditClick = (supplyId: number) => {
+    if (showUpdateForm.has(supplyId)) {
+      showUpdateForm.delete(supplyId);
+    } else {
+      showUpdateForm.add(supplyId);
+    }
+  }
+
+  const formCallback = () => {
+      if (form?.success && form.type === 'updateSupply') {
+        showUpdateForm.delete(form.supplyId);
+      }
   }
 </script>
 
 <h1>Pet Supplies</h1>
-
 <MappedPetItems
   pets={data.pets || []}
   items={data.supplies || []}
@@ -48,20 +64,37 @@
 
           <button aria-label="Delete Supply">Delete Supply</button>
         </form>
+        <button onclick={() => handleEditClick(supply.id)}>
+          {showUpdateForm.has(supply.id) ? 'hide' : 'edit'}
+        </button>
+        {#if showUpdateForm.has(supply.id)}
+          <Form
+            data={supply}
+            {...FormTypes.update}
+            fields={[{ label: 'id', type: 'hidden', name: 'id', value: String(supply.id) }, ...formFields]}
+            submitText='edit'
+            {formCallback}
+          />
+        {/if}
       </div>
     {/each}
   </div>
 {/snippet}
 
-<button onclick={() => showForm = !showForm}>
-  {#if showForm}
+<button onclick={() => showCreateForm = !showCreateForm}>
+  {#if showCreateForm}
     Hide Form
   {:else}
     Add a supply
   {/if}
 </button>
-{#if showForm}
-  <Form {...formFields} />
+{#if showCreateForm}
+  <Form
+    fields={formFields}
+    {...FormTypes.create}
+    submitText='Add a supply'
+    {formCallback}
+  />
 {/if}
 
 <style>

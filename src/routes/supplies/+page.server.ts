@@ -1,4 +1,4 @@
-import { addSupply, deleteSupply, getSupplies } from "$lib/server/supplies";
+import { addSupply, deleteSupply, getSupplies, updateSupply } from "$lib/server/supplies";
 import { getPet } from "$lib/server/pets";
 import type { InsertSupplies } from "$lib/server/db/schema"
 import { fail } from "@sveltejs/kit";
@@ -45,6 +45,30 @@ export const actions = {
     try {
 
       await deleteSupply(Number(data.get('id')));
+    } catch(e) {
+      return fail(422, {
+        description: data.get('description'),
+        error: e.message,
+      });
+    }
+  },
+  updateSupply: async ({ request }: RequestEvent ) => {
+    const data = await request.formData();
+    const formFieldValues = {
+      id: Number(data.get('id')),
+      supplyType: String(data.get('supplyType')),
+      inventory: Number(data.get('inventory')),
+      description: String(data.get('description')),
+      petName: String(data.get('petName')).toLowerCase(),
+    };
+
+    try {
+      const [updatedSupplyItem] = await updateSupply(formFieldValues);
+      return {
+        success: true,
+        supplyId: updatedSupplyItem.id,
+        type: 'updateSupply',
+      };
     } catch(e) {
       return fail(422, {
         description: data.get('description'),

@@ -66,7 +66,7 @@ export const actions = {
         ...formFieldValues,
       };
 
-      await updateTodo(params);
+      return await updateTodo(params);
     } catch (e) {
       return fail(422, {
         description: `not sure what this is ${e}`,

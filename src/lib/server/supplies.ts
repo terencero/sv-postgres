@@ -28,3 +28,15 @@ export async function deleteSupply(params: Supplies['id']) {
     throw new Error('getSupplies failed');
   }
 }
+
+export async function updateSupply(params: InsertSupplies) {
+  try {
+    if (params.id) {
+      return await db.update(supplies).set(params).where(eq(supplies.id, params.id)).returning();
+    }
+    throw new Error('updateSupplies failed');
+  } catch(e) {
+    console.error(`wtf: ${e}`);
+    throw new Error('updateSupplies faile');
+  }
+}

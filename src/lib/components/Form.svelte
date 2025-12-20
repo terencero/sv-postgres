@@ -18,11 +18,16 @@
   }
 
   type FormData = Todos | Supplies;
-  type FormProps = FormFields & { data?: FormData };
+  type FormProps = FormFields & { data?: FormData, formCallback?: () => void };
   let formData: FormProps = $props();
 </script>
 
-<form action={formData.action} method={formData.method} use:enhance>
+<form action={formData.action} method={formData.method} use:enhance={() => (
+  async ({ update }) => {
+    formData.formCallback?.();
+    await update();
+  }
+)}>
   {#each formData.fields as { label, type, name, value = formData.data?.[name as keyof (Todos | Supplies)] || '', selectOptions = [''] } (name)}
     {#if type === 'hidden'}
       <input {type} {name} {value} />
