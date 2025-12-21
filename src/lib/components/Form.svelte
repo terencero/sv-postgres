@@ -24,8 +24,8 @@
 
 <form action={formData.action} method={formData.method} use:enhance={() => (
   async ({ update }) => {
-    formData.formCallback?.();
     await update();
+    formData.formCallback?.();
   }
 )}>
   {#each formData.fields as { label, type, name, value = formData.data?.[name as keyof (Todos | Supplies)] || '', selectOptions = [''] } (name)}
