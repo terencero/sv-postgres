@@ -35,16 +35,6 @@
       showUpdateForm.add(supplyId);
     }
   }
-  const changeForm = () => showCreateForm = !showCreateForm;
-  const formCallback = () => {
-    if (form?.success) {
-      if (form.actionType === 'updateSupply') {
-        showUpdateForm.delete(form.supplyId);
-      } else if (form.actionType === 'addSupply') {
-        console.log('stub');
-      }
-    }
-  }
 </script>
 
 <h1>Pet Supplies</h1>
@@ -77,7 +67,13 @@
             {...FormTypes.update}
             fields={[{ label: 'id', type: 'hidden', name: 'id', value: String(supply.id) }, ...formFields]}
             submitText='edit'
-            {...formCallback}
+            formCallback={() => {
+              if (form?.success) {
+                if (form.actionType === 'updateSupply') {
+                  showUpdateForm.delete(form.supplyId);
+                }
+              }
+            }}
           />
         {/if}
       </div>
