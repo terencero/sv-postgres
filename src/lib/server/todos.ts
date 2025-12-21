@@ -4,7 +4,7 @@ import { todos, type InsertTodos } from "./db/schema";
 
 export async function addTodo(params: InsertTodos) {
   try {
-    await db.insert(todos).values(params);
+    return await db.insert(todos).values(params).returning();
   } catch(e){
     console.error(`addTodo failed: ${e}`);
     throw new Error('addTodo failed');

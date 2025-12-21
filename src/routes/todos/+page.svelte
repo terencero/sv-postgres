@@ -42,6 +42,16 @@
       showUpdateForm.add(todoId);
     }
   }
+
+  const formCallback = () => {
+    if (form?.success) {
+      if (form.actionType === 'updateTodo') {
+        showUpdateForm.delete(form.todoId);
+      } else if (form.actionType === 'addTodo') {
+        showCreateForm = !showCreateForm;
+      }
+    }
+  }
 </script>
 
 <h1>Todos</h1>
@@ -76,7 +86,7 @@
           <p><b>Notes: </b>{todo.notes}</p>
           <button aria-label="Mark Complete">Mark Complete</button>
         </form>
-        <form method="POST" action="?/deleteTodo">
+        <form method="POST" action="?/deleteTodo" use:enhance>
           <input type="hidden" name="id" value={todo.id} />
           <button aria-label="Delete">Delete</button>
         </form>
@@ -89,6 +99,7 @@
             {...FormTypes.update}
             fields={[{ label: 'id: ', type: 'hidden', name: 'id', value: String(todo.id) }, ...formFields]}
             submitText='edit'
+            {formCallback}
           />
         {/if}
       </div>
@@ -109,6 +120,7 @@
     {...FormTypes.create}
     fields={formFields}
     submitText='Add a Todo'
+    {formCallback}
   />
 {/if}
 

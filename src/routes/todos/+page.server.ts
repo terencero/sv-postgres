@@ -37,7 +37,13 @@ export const actions = {
         ...rest,
       };
 
-      await addTodo(params);
+      const [newTodo] = await addTodo(params);
+
+      return {
+        success: true,
+        actionType: 'addTodo',
+        todoId: newTodo.id,
+      };
     } catch (e) {
       return fail(422, {
         description: `not sure what this is ${e}`,
@@ -65,8 +71,13 @@ export const actions = {
       const params: UpdatedTodo = {
         ...formFieldValues,
       };
+      const [updatedTodo] = await updateTodo(params);
 
-      return await updateTodo(params);
+      return {
+        success: true,
+        todoId: updatedTodo.id,
+        actionType: 'updateTodo',
+      };
     } catch (e) {
       return fail(422, {
         description: `not sure what this is ${e}`,
