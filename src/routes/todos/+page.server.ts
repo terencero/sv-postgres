@@ -1,11 +1,18 @@
 import { addTodo, deleteTodo, getTodos, updateTodo } from "$lib/server/todos";
 import { getPet } from "$lib/server/pets";
 import type { InsertTodos } from "$lib/server/db/schema"
-import { fail } from "@sveltejs/kit";
+import { error, fail } from "@sveltejs/kit";
 import type { RequestEvent } from "./$types";
 
 export async function load() {
   const todos = await getTodos();
+
+  if (!todos.length) {
+    error(404, {
+      message: 'Todos not found',
+    });
+  }
+  
   return {
     todos,
   };
@@ -45,10 +52,16 @@ export const actions = {
         todoId: newTodo.id,
       };
     } catch (e) {
-      return fail(422, {
-        description: `not sure what this is ${e}`,
-        error: e.message,
-      });
+      console.error(`addTodo failed: ${e}`);
+
+      if (e instanceof Error) {
+        return fail(422, {
+          description: `not sure what this is ${e}`,
+          error: e.message,
+        });
+      }
+
+      throw e;
     }
   },
   updateTodo: async ({ request }: RequestEvent) => {
@@ -79,10 +92,16 @@ export const actions = {
         actionType: 'updateTodo',
       };
     } catch (e) {
-      return fail(422, {
-        description: `not sure what this is ${e}`,
-        error: e.message,
-      });
+      console.error(`updateTodo failed: ${e}`);
+
+      if (e instanceof Error) {
+        return fail(422, {
+          description: `not sure what this is ${e}`,
+          error: e.message,
+        });
+      }
+      
+      throw e;
     }
   },
   completeTodo: async ({ request }: RequestEvent) => {
@@ -96,10 +115,16 @@ export const actions = {
     try {
       await updateTodo(formFieldValues);
     } catch(e) {
-      return fail(422, {
-        description: `not sure what this is ${e}`,
-        error: e.message,
-      });
+      console.error(`completeTodo 'aka updateTodo' failed: ${e}`);
+
+      if (e instanceof Error) {
+        return fail(422, {
+          description: `not sure what this is ${e}`,
+          error: e.message,
+        });
+      }
+      
+      throw e;
     }
   },
   deleteTodo: async ({ request }: { request: Request }) => {
@@ -108,10 +133,16 @@ export const actions = {
 
       await deleteTodo(Number(data.get('id')));
     } catch(e) {
-      return fail(422, {
-        description: `not sure what this is ${e}`,
-        error: e.message,
-      });
+      console.error(`deleteTodo failed: ${e}`);
+
+      if (e instanceof Error) {
+        return fail(422, {
+          description: `not sure what this is ${e}`,
+          error: e.message,
+        });
+      }
+      
+      throw e;
     }
   }
 }

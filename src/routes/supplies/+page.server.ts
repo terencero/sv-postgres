@@ -1,11 +1,18 @@
 import { addSupply, deleteSupply, getSupplies, updateSupply } from "$lib/server/supplies";
 import { getPet } from "$lib/server/pets";
 import type { InsertSupplies } from "$lib/server/db/schema"
-import { fail } from "@sveltejs/kit";
+import { error, fail } from "@sveltejs/kit";
 import type { RequestEvent } from "../$types";
 
 export async function load() {
   const supplies = await getSupplies();
+
+  if (!supplies.length) {
+    error(404, {
+      message: 'Supplies not found',
+    });
+  }
+
   return {
     supplies,
   }
@@ -40,10 +47,14 @@ export const actions = {
         actionType: 'addSupply',
       };
     } catch (e) {
-      return fail(422, {
-        description: data.get('description'),
-        error: e.message,
-      });
+      if (e instanceof Error) {
+        return fail(422, {
+          description: data.get('description'),
+          error: e.message,
+        });
+      }
+
+      throw e;
     }
   },
   deleteSupply: async ({ request }: RequestEvent ) => {
@@ -52,10 +63,14 @@ export const actions = {
 
       await deleteSupply(Number(data.get('id')));
     } catch(e) {
-      return fail(422, {
-        description: data.get('description'),
-        error: e.message,
-      });
+      if (e instanceof Error) {
+        return fail(422, {
+          description: data.get('description'),
+          error: e.message,
+        });
+      }
+
+      throw e;
     }
   },
   updateSupply: async ({ request }: RequestEvent ) => {
@@ -76,10 +91,14 @@ export const actions = {
         actionType: 'updateSupply',
       };
     } catch(e) {
-      return fail(422, {
-        description: data.get('description'),
-        error: e.message,
-      });
+      if (e instanceof Error) {
+        return fail(422, {
+          description: data.get('description'),
+          error: e.message,
+        });
+      }
+
+      throw e;
     }
   }
 }
