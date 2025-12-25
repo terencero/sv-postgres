@@ -31,11 +31,11 @@ export async function getTodos() {
   }
 }
 
-export async function getTodosByUpcoming(petId: number[], limit = new Date()) {
+export async function getTodosByUpcoming(petId: number[], dateRange = new Date()) {
   try {
     return await db.query.todos.findMany({
       where: (todos, { gte, and, inArray }) => and(
-        gte(todos.dueDate.getSQL(), limit),
+        gte(todos.dueDate.getSQL(), dateRange),
         inArray(todos.petId, petId)
       ),
       orderBy: (todos, { asc }) => asc(todos.dueDate),

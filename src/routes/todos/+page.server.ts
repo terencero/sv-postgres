@@ -1,4 +1,4 @@
-import { addTodo, deleteTodo, getTodos, updateTodo } from "$lib/server/todos";
+import { addTodo, deleteTodo, getTodos, getTodosByUpcoming, updateTodo } from "$lib/server/todos";
 import { getPet } from "$lib/server/pets";
 import type { InsertTodos } from "$lib/server/db/schema"
 import { error, fail } from "@sveltejs/kit";
@@ -144,5 +144,21 @@ export const actions = {
       
       throw e;
     }
-  }
+  },
+  setNotificationsDateRangePicker: async (petId: number[], dateRange: Date) => {
+    try {
+      await getTodosByUpcoming(petId, dateRange);
+    } catch (e) {
+      console.error(`setting todo notification range failed: ${e}`);
+
+      if (e instanceof Error) {
+        return fail(422, {
+          description: `not sure what this is ${e}`,
+          error: e.message,
+        });
+      }
+      
+      throw e;
+    }
+  },
 }
