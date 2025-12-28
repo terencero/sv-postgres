@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { enhance } from "$app/forms";
 	import type { SelectPetProfiles, SelectTodos } from "$lib/server/db/schema";
+	import type { CalendarOptions } from "./notifications";
 
 // flag ones that should trigger an animation (default to on day for now)
   type TodosWithPet = SelectTodos & { pet: SelectPetProfiles | null };
@@ -8,7 +10,7 @@
   }
   let { todos }: Props = $props();
 
-  const calendarOptions = ['days', 'weeks', 'months', 'years'];
+  const calendarOptions: CalendarOptions[] = ['days', 'weeks', 'custom'];
 
   let after: number | undefined = $state();
   let selectedOption: string = $state('days');
@@ -19,7 +21,11 @@
 
 <div>
     Date range picker
-  <form method="POST" action="">
+  <form
+    method="POST"
+    action="/todos?/setNotificationsDateRangePicker"
+    use:enhance
+  >
     <select
       name="notification-range"
       bind:value={selectedOption}

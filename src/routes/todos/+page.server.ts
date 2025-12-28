@@ -1,5 +1,5 @@
 import { addTodo, deleteTodo, getTodos, getTodosByUpcoming, updateTodo } from "$lib/server/todos";
-import { getPet } from "$lib/server/pets";
+import { getPet, getPets } from "$lib/server/pets";
 import type { InsertTodos } from "$lib/server/db/schema"
 import { error, fail } from "@sveltejs/kit";
 import type { RequestEvent } from "./$types";
@@ -145,9 +145,56 @@ export const actions = {
       throw e;
     }
   },
-  setNotificationsDateRangePicker: async (petId: number[], dateRange: Date) => {
+  setNotificationsDateRangePicker: async ({ request, locals }: RequestEvent) => {
     try {
-      await getTodosByUpcoming(petId, dateRange);
+      if (!locals.user) {
+        return fail(422, {
+          description: 'failed to set notification range.',
+          error: 'user not signed in.'
+        });
+      }
+
+      const pets = await getPets(locals.user?.id);
+      const data = await request.formData();
+      const notificationRange = String(data.get('notification-range'));
+      const dateRange = Number(data.get('after'));
+
+      let range;
+      const now = new Date();
+
+      switch (notificationRange) {
+        case 'days': {
+          range = new Date(now.getFullYear(), now.getMonth(), now.getDate() + dateRange);
+
+          break;
+        }
+        case 'weeks': {
+          range = new Date(now.getFullYear(), now.getMonth(), now.getDate() + dateRange  * 7);
+          break;
+        }
+        case 'custom': {
+          const future = new Date(dateRange);
+
+          if (now > future) {
+            console.warn('date range is less than today');
+            break;
+          }
+
+          range = future;
+          break;
+        }
+        default:
+          console.warn('no date range was set');
+      }
+
+      if (range === undefined) {
+        return fail(422, {
+          description: 'cannot set the notification range.',
+          error: 'date range cannot be undefined.'
+        })
+      }
+
+      await getTodosByUpcoming(pets.map(pet => pet.id), range);
     } catch (e) {
       console.error(`setting todo notification range failed: ${e}`);
 
