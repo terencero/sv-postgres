@@ -6,7 +6,8 @@ export const load: LayoutServerLoad = async ({ locals }) => {
   if (locals.user) {
     try {
       const pets = await getPets(locals.user.id);
-      const todosByUpcoming = await getTodosByUpcoming(pets.map((pet) => pet.id));
+      const todosByUpcoming = locals.updatedTodosByUpcoming || await getTodosByUpcoming(pets.map((pet) => pet.id));
+
       return {
         pets,
         user: locals.user.username,
@@ -16,5 +17,6 @@ export const load: LayoutServerLoad = async ({ locals }) => {
       console.error(`failed in layoutServerLoad: ${e}`);
     }
   }
+
   return {};
 }

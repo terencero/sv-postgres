@@ -2,6 +2,7 @@
 import type { PageProps } from "./$types";
 import { enhance } from '$app/forms';
 import Notifications from "$lib/components/Notifications.svelte";
+	import { page } from "$app/state";
 
 let { form, data }: PageProps = $props();
 </script>
@@ -10,11 +11,17 @@ let { form, data }: PageProps = $props();
 
 {#if data.user }
   <h2>Welcome {data.user}!</h2>
+
   <form method="post" action="?/logout" use:enhance>
     <button>Sign out</button>
   </form>
+
+  <h2>Upcoming:</h2>
+
+  <Notifications todos={page.form?.todosByUpcoming || data.todosByUpcoming} />
 {:else}
   <h1>Login/Register</h1>
+
   <form method="post" action="?/login" use:enhance>
     <label>
       Username
@@ -30,5 +37,3 @@ let { form, data }: PageProps = $props();
   <p style="color: red">{form?.message ?? ''}</p>
 {/if}
 
-<h2>Upcoming:</h2>
-<Notifications todos={data.todosByUpcoming || []} />

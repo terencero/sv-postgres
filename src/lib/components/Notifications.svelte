@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { enhance } from "$app/forms";
+	import { applyAction, enhance } from "$app/forms";
 	import type { SelectPetProfiles, SelectTodos } from "$lib/server/db/schema";
 	import type { CalendarOptions } from "./notifications";
 
@@ -14,7 +14,6 @@
 
   let after: number | undefined = $state();
   let selectedOption: string = $state('days');
-
 </script>
 
 <h2>Notifications</h2>
@@ -24,7 +23,13 @@
   <form
     method="POST"
     action="/todos?/setNotificationsDateRangePicker"
-    use:enhance
+    use:enhance={() => {
+      // override the default form behavior and prevent data invalidation to
+      // stop root layout server from rerunning
+      return async ({ result }) => {
+        await applyAction(result);
+      }
+    }}
   >
     <select
       name="notification-range"

@@ -194,7 +194,13 @@ export const actions = {
         })
       }
 
-      await getTodosByUpcoming(pets.map(pet => pet.id), range);
+      // not working because both hooks and layout.server run before this nested page.server...
+      // in that order.
+      // and locals lives on the request object so it's state is based on each request and 
+      // therefore, not persisted...
+      const todosByUpcoming = await getTodosByUpcoming(pets.map(pet => pet.id), range);
+
+      return { todosByUpcoming };
     } catch (e) {
       console.error(`setting todo notification range failed: ${e}`);
 
