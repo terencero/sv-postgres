@@ -214,4 +214,7 @@ export const actions = {
       throw e;
     }
   },
+  setReminder() {
+    // TODO:reminders
+ }
 }

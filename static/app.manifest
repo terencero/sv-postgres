@@ -1,0 +1,13 @@
+{
+  "name": "Pet Keeper",
+  "display": "standalone",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/icons/test.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purposed": "maskable"
+    }
+  ]
+}

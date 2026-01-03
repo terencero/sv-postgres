@@ -86,6 +86,7 @@
           <p><b>Notes: </b>{todo.notes}</p>
           <button aria-label="Mark Complete">Mark Complete</button>
         </form>
+        <button>remind me</button>
         <form method="POST" action="?/deleteTodo" use:enhance>
           <input type="hidden" name="id" value={todo.id} />
           <button aria-label="Delete">Delete</button>
