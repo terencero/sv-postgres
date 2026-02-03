@@ -44,6 +44,37 @@ self.addEventListener('activate', (event) => {
 	event.waitUntil(deleteOldCaches());
 });
 
+async function fetchFromCacheFirst(request: FetchEvent['request'], cache: Cache) {
+  // try the cache first, but
+  // fall back to the network
+  try {
+    const response = await cache.match(request);
+
+    if (response) {
+      return response;
+    }
+
+    // if there's no cache, then just error out
+    // as there is nothing we can do to respond to this request
+    throw new Error('Cache miss');
+  } catch (err) {
+    console.log(err);
+    const response = await fetch(request);
+
+    // if we're offline, fetch can return a value that is not a Response
+    // instead of throwing - and we can't pass this non-Response to respondWith
+    if (!(response instanceof Response)) {
+      throw new Error('invalid response from fetch');
+    }
+
+    if (response.status === 200) {
+      cache.put(request, response.clone());
+    }
+
+    return response;
+  }
+}
+
 self.addEventListener('fetch', (event) => {
 	// ignore POST requests etc
 	if (event.request.method !== 'GET') return;
@@ -60,34 +91,9 @@ self.addEventListener('fetch', (event) => {
 				return response;
 			}
 		}
+      const response = await fetchFromCacheFirst(event.request, cache);
 
-		// for everything else, try the network first, but
-		// fall back to the cache if we're offline
-		try {
-			const response = await fetch(event.request);
-
-			// if we're offline, fetch can return a value that is not a Response
-			// instead of throwing - and we can't pass this non-Response to respondWith
-			if (!(response instanceof Response)) {
-				throw new Error('invalid response from fetch');
-			}
-
-			if (response.status === 200) {
-				cache.put(event.request, response.clone());
-			}
-
-			return response;
-		} catch (err) {
-			const response = await cache.match(event.request);
-
-			if (response) {
-				return response;
-			}
-
-			// if there's no cache, then just error out
-			// as there is nothing we can do to respond to this request
-			throw err;
-		}
+      return response;
 	}
 
 	event.respondWith(respond());

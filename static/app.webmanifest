@@ -7,7 +7,7 @@
       "src": "/icons/test.svg",
       "type": "image/svg+xml",
       "sizes": "any",
-      "purposed": "maskable"
     }
-  ]
+  ],
+  "theme_color": "black"
 }
