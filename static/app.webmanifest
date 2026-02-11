@@ -6,7 +6,7 @@
     {
       "src": "/icons/test.svg",
       "type": "image/svg+xml",
-      "sizes": "any",
+      "sizes": "any"
     }
   ],
   "theme_color": "black"

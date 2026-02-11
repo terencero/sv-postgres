@@ -42,9 +42,24 @@ self.addEventListener('activate', (event) => {
 	}
 
 	event.waitUntil(deleteOldCaches());
+  event.waitUntil(self.registration?.navigationPreload.enable());
 });
 
-async function fetchFromCacheFirst(request: FetchEvent['request'], cache: Cache) {
+interface CacheFirst {
+  event: FetchEvent,
+  cache: Cache,
+}
+
+async function putInCache(request, response) {
+  const cache = await caches.open(CACHE);
+  await cache.put(request, response);
+};
+
+async function fetchFromCacheFirst({
+  event,
+  cache,
+}: CacheFirst) {
+  const { request, preloadResponse } = event;
   // try the cache first, but
   // fall back to the network
   try {
@@ -59,11 +74,24 @@ async function fetchFromCacheFirst(request: FetchEvent['request'], cache: Cache)
     throw new Error('Cache miss');
   } catch (err) {
     console.log(err);
+
+    const preloadRes = await preloadResponse; 
+    if (preloadRes) {
+      console.log(`using preload response: ${preloadRes}`);
+
+      event.waitUntil(putInCache(request, preloadRes.clone()));
+      return preloadRes;
+    }
+
     const response = await fetch(request);
 
     // if we're offline, fetch can return a value that is not a Response
     // instead of throwing - and we can't pass this non-Response to respondWith
     if (!(response instanceof Response)) {
+      // TODO: return a fallback template and throw this error if fallback
+      // can't be reached?
+      // TODO: where did I get this throw error from? I think this needs to 
+      // be a Response instance...
       throw new Error('invalid response from fetch');
     }
 
@@ -91,7 +119,11 @@ self.addEventListener('fetch', (event) => {
 				return response;
 			}
 		}
-      const response = await fetchFromCacheFirst(event.request, cache);
+      const response = await fetchFromCacheFirst({
+        request: event.request,
+        cache: cache,
+        preloadResponsePromise: event.preloadResponse,
+    });
 
       return response;
 	}
