@@ -24,10 +24,16 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (event) => {
+  console.log('installing sw')
 	// Create a new cache and add all files to it
 	async function addFilesToCache() {
-		const cache = await caches.open(CACHE);
-		await cache.addAll(ASSETS);
+    try {
+
+      const cache = await caches.open(CACHE);
+      await cache.addAll(ASSETS);
+    } catch(e) {
+      console.error(`cache open or addall failure: ${e}`)
+    }
 	}
 
 	event.waitUntil(addFilesToCache());
@@ -41,9 +47,42 @@ self.addEventListener('activate', (event) => {
 		}
 	}
 
+  event.waitUntil(enableNavigationPreloadIfAvailable());
 	event.waitUntil(deleteOldCaches());
-  event.waitUntil(self.registration?.navigationPreload.enable());
 });
+
+self.addEventListener('fetch', (event) => {
+	// ignore POST requests etc
+	if (event.request.method !== 'GET') return;
+
+	async function respond() {
+		const url = new URL(event.request.url);
+		const cache = await caches.open(CACHE);
+
+		// `build`/`files` can always be served from the cache
+		if (ASSETS.includes(url.pathname)) {
+			const response = await cache.match(url.pathname);
+
+			if (response) {
+				return response;
+			}
+		}
+      const response = await fetchFromCacheFirst({
+        event,
+        cache,
+    });
+
+      return response;
+	}
+
+	event.respondWith(respond());
+});
+
+async function enableNavigationPreloadIfAvailable() {
+  if (self.registration.navigationPreload) {
+    await self.registration.navigationPreload.enable();
+  }
+}
 
 interface CacheFirst {
   event: FetchEvent,
@@ -51,6 +90,7 @@ interface CacheFirst {
 }
 
 async function putInCache(request, response) {
+  console.log('putting in cache')
   const cache = await caches.open(CACHE);
   await cache.put(request, response);
 };
@@ -84,49 +124,23 @@ async function fetchFromCacheFirst({
     }
 
     const response = await fetch(request);
-
     // if we're offline, fetch can return a value that is not a Response
     // instead of throwing - and we can't pass this non-Response to respondWith
     if (!(response instanceof Response)) {
       // TODO: return a fallback template and throw this error if fallback
       // can't be reached?
       // TODO: where did I get this throw error from? I think this needs to 
-      // be a Response instance...
+      // be a Response instance... Oh... I got this from the sveltekit boilerplate
+      // code... I think it's here so that the svelte error handler can trigger
+      // the svelte error page
       throw new Error('invalid response from fetch');
     }
 
     if (response.status === 200) {
-      cache.put(request, response.clone());
+      event.waitUntil(putInCache(request, response.clone()));
     }
 
     return response;
   }
 }
 
-self.addEventListener('fetch', (event) => {
-	// ignore POST requests etc
-	if (event.request.method !== 'GET') return;
-
-	async function respond() {
-		const url = new URL(event.request.url);
-		const cache = await caches.open(CACHE);
-
-		// `build`/`files` can always be served from the cache
-		if (ASSETS.includes(url.pathname)) {
-			const response = await cache.match(url.pathname);
-
-			if (response) {
-				return response;
-			}
-		}
-      const response = await fetchFromCacheFirst({
-        request: event.request,
-        cache: cache,
-        preloadResponsePromise: event.preloadResponse,
-    });
-
-      return response;
-	}
-
-	event.respondWith(respond());
-});
