@@ -1,12 +1,28 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-import favicon from '$lib/assets/favicon.svg';
+  import { pwaInfo } from 'virtual:pwa-info';
+  import favicon from '$lib/assets/favicon.svg';
+	import { onMount } from 'svelte';
 
+  let webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : '';
 	let { children } = $props();
+
+  onMount(async () => {
+    if (pwaInfo) {
+      const { registerSW } = await import('virtual:pwa-register');
+      registerSW({
+        immediate: true,
+        onRegistered(r) {
+          console.log(`sw registered: ${r}`);
+        },
+      });
+    }
+  })
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+  {webManifestLink}
 </svelte:head>
 
 <nav>

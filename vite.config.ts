@@ -2,9 +2,27 @@ import devtoolsJson from 'vite-plugin-devtools-json';
 import { defineConfig } from 'vitest/config';
 import { playwright } from '@vitest/browser-playwright';
 import { sveltekit } from '@sveltejs/kit/vite';
+import { SvelteKitPWA } from '@vite-pwa/sveltekit';
 
 export default defineConfig({
-	plugins: [sveltekit(), devtoolsJson()],
+  define: {
+    'process.env.NODE_ENV': process.env.NODE_ENV === 'production'
+      ? '"production"'
+      : '"development"'
+  },
+	plugins: [
+    sveltekit(),
+    devtoolsJson(),
+    SvelteKitPWA({
+      registerType: 'autoUpdate',
+      devOptions: {
+        enabled: true
+      },
+      kit: {
+        includeVersionFile: true
+      }
+    })
+  ],
 	test: {
 		expect: { requireAssertions: true },
 		projects: [

@@ -28,6 +28,7 @@
 		"@sveltejs/kit": "^2.47.1",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@types/node": "^24",
+		"@vite-pwa/sveltekit": "^1.1.0",
 		"@vitest/browser-playwright": "^4.0.5",
 		"drizzle-kit": "^0.31.5",
 		"drizzle-orm": "^0.44.6",
