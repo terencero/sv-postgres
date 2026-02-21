@@ -51,6 +51,17 @@ self.addEventListener('activate', (event) => {
 	event.waitUntil(deleteOldCaches());
 });
 
+self.addEventListener('sync', (event) => {
+  // TODO: come back to this when sync manager is supported in safari and firefox...
+  if (event.tag === 'post-todo') {
+    storeDataInIndexedDB('todoDB', Number(version));
+  }
+});
+
+function storeDataInIndexedDB(dbName: string, version: number) {
+ const db = indexedDB.open(dbName, version);
+}
+
 self.addEventListener('fetch', (event) => {
 	// ignore POST requests etc
 	if (event.request.method !== 'GET') return;
