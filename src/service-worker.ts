@@ -51,6 +51,33 @@ self.addEventListener('activate', (event) => {
 	event.waitUntil(deleteOldCaches());
 });
 
+// INFO: keeping this interface here because 'extended-types.d.ts'
+// in the lib dir doesn't have access to it there
+interface BackgroundSyncEvent extends ExtendableEvent {
+  tag: string;
+  lastChance: boolean;
+}
+
+// @ts-expect-error background sync isn't typed in sveltekit?
+self.addEventListener('sync', (event: BackgroundSyncEvent) => {
+  if (event.tag && event.tag === 'add-todo-or-supply') {
+    // TODO: forward to fetch? will backgroundSync just handle the network
+    // connectivity?
+    // event.waitUntil(fetch())
+  }
+
+  if (event.lastChance) {
+    // TODO: store in indexedDb or alert user to retry?
+
+  }
+
+  async function sendMessage(message: Record<string, string>) {
+    const clients = await self.clients.matchAll();
+
+    clients.forEach(client => client.postMessage(message));
+  }
+});
+
 self.addEventListener('fetch', (event) => {
 	// ignore POST requests etc
 	if (event.request.method !== 'GET') return;

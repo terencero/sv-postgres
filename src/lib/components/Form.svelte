@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from "$app/forms";
+	import type { ServiceWorkerBackgroundSync } from "$lib/extended-types/extended-types";
 	import type { Supplies, Todos } from "$lib/server/db/schema";
 	import type { HTMLFormAttributes } from "svelte/elements";
   
@@ -20,10 +21,29 @@
   type FormData = Todos | Supplies;
   type FormProps = FormFields & { data?: FormData, formCallback?: () => void };
   let formData: FormProps = $props();
+
+  const submitFormLater = async () => {
+    const registration: ServiceWorkerBackgroundSync = await navigator.serviceWorker.ready;
+    try {
+      if (!registration.sync) {
+        throw new Error('Background Sync API not supported')
+      }
+
+      registration.sync.register('add-todo-or-supply');
+    } catch (error) {
+      console.warn(`Background Sync API failed: ${error}`);
+
+      // TODO: fallback option: use indexedDb to manually transact data to be fetched later 
+    }
+  } 
 </script>
 
 <form action={formData.action} method={formData.method} use:enhance={() => (
   async ({ update }) => {
+    if (!navigator.onLine) {
+      await submitFormLater();
+      return;
+    }
     await update();
     formData.formCallback?.();
   }
