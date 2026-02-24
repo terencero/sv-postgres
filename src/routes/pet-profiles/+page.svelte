@@ -59,10 +59,15 @@
 <style>
   div {
     border: .2rem solid blue;
+    border-radius: 1em;
     display: flex;
     flex-direction: column;
     gap: 1rem;
     margin-bottom: 1rem;
     padding: 1.5rem;
+
+    p {
+      margin: 0;
+    }
   }
 </style>
