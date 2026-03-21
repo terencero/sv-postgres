@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-import favicon from '$lib/assets/favicon.svg';
+  import favicon from '$lib/assets/favicon.svg';
 
 	let { children } = $props();
 </script>
@@ -20,12 +20,18 @@ import favicon from '$lib/assets/favicon.svg';
 </main>
 
 <style>
+  :global(body) {
+    margin: 0;
+  }
   nav {
     display: flex;
-    margin: 2rem 2rem 0;
+    margin: 2rem 0 0;
     padding: .5rem 0;
     justify-content: space-evenly;
     background-color: deepskyblue;
+  }
+  main {
+    padding: 1rem;
   }
 
   @media (max-width: 768px) {
@@ -33,17 +39,26 @@ import favicon from '$lib/assets/favicon.svg';
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      margin-bottom: 0;
     }
     nav {
+      display: flex;
       position: sticky;
       order: 2;
       bottom: 0;
+      justify-content: space-between;
+      a {
+        flex: 1;
+        text-align: center;
+      }
     }
     main {
       flex: 1;
       order: 1;
       padding: 1rem;
     }
+  }
+
+  @media (display-mode: browser) {
+    /* conditionally show installation invitation */
   }
 </style>
