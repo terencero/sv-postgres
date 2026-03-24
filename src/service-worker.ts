@@ -28,6 +28,7 @@ self.addEventListener('install', (event) => {
 	// Create a new cache and add all files to it
 	async function addFilesToCache() {
     try {
+      console.log(`install: assets - ${ASSETS}`);
 
       const cache = await caches.open(CACHE);
       await cache.addAll(ASSETS);
@@ -64,6 +65,8 @@ self.addEventListener('sync', (event: BackgroundSyncEvent) => {
     // TODO: forward to fetch? will backgroundSync just handle the network
     // connectivity?
     // event.waitUntil(fetch())
+    // try fetching the data from api call?
+    event.waitUntil(fetchFromNetwork(event));
   }
 
   if (event.lastChance) {
@@ -91,6 +94,7 @@ self.addEventListener('fetch', (event) => {
 			const response = await cache.match(url.pathname);
 
 			if (response) {
+        console.log(`returning from assets: files- ${files}\nbuild - ${build}`);
 				return response;
 			}
 		}
@@ -126,13 +130,14 @@ async function fetchFromCacheFirst({
   event,
   cache,
 }: CacheFirst) {
-  const { request, preloadResponse } = event;
+  const { request } = event;
   // try the cache first, but
   // fall back to the network
   try {
     const response = await cache.match(request);
 
     if (response) {
+      console.log(`serving cache from matching request`);
       return response;
     }
 
@@ -141,8 +146,18 @@ async function fetchFromCacheFirst({
     throw new Error('Cache miss');
   } catch (err) {
     console.log(err);
+    
+    return await fetchFromNetwork(request);
+  }
+}
 
-    const preloadRes = await preloadResponse; 
+async function fetchFromNetwork(event) {
+  // TODO: detect request method? if not a get, then what? or keep the same?
+    const { request, preloadResponse } = event;
+    // try preload response first to run the network in parallel while the
+    // service worker boots up
+    // wrap preloadResponse in Promise.resolve in case it's undefined
+    const preloadRes = await Promise.resolve(preloadResponse);
     if (preloadRes) {
       console.log(`using preload response: ${preloadRes}`);
 
@@ -168,6 +183,4 @@ async function fetchFromCacheFirst({
     }
 
     return response;
-  }
 }
-
