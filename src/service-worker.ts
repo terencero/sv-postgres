@@ -28,9 +28,9 @@ self.addEventListener('install', (event) => {
 	// Create a new cache and add all files to it
 	async function addFilesToCache() {
     try {
-
       const cache = await caches.open(CACHE);
       await cache.addAll(ASSETS);
+      console.log(`assets: ${ASSETS}\n build: ${build}\n files: ${files}\n version: ${version}`);
     } catch(e) {
       console.error(`cache open or addall failure: ${e}`)
     }
@@ -51,6 +51,62 @@ self.addEventListener('activate', (event) => {
 	event.waitUntil(deleteOldCaches());
 });
 
+self.addEventListener('fetch', (event) => {
+	// ignore POST requests etc
+	if (event.request.method !== 'GET') return;
+
+	async function respond() {
+		const url = new URL(event.request.url);
+		const cache = await caches.open(CACHE);
+
+		// `build`/`files` can always be served from the cache
+		if (ASSETS.includes(url.pathname)) {
+			const response = await cache.match(url.pathname);
+
+			if (response) {
+				return response;
+			}
+		}
+
+    // for everything else, try the network first, but
+    // fall back to the cache if we're offline
+    try {
+      // try preload response first to run the network in parallel while the
+      // service worker boots up
+      const preloadResponse = await Promise.resolve(event.preloadResponse);
+      if (preloadResponse) {
+        await putInCache(event.request, preloadResponse.clone());
+        return preloadResponse;
+      }
+
+      const response = await fetch(event.request);
+
+      // if we're offline, fetch can return a value that is not a Response
+      // instead of throwing - and we can't pass this non-Response to respondWith
+      if (!(response instanceof Response)) {
+        throw new Error('invalid response from fetch');
+      }
+
+      if (response.status === 200) {
+        cache.put(event.request, response.clone());
+      }
+
+      return response;
+    } catch (err) {
+      const response = await cache.match(event.request);
+
+      if (response) {
+        return response;
+      }
+      // if there's no cache, then just error out
+      // as there is nothing we can do to respond to this request
+      throw err;
+    }
+  }
+
+	event.respondWith(respond());
+});
+
 // INFO: keeping this interface here because 'extended-types.d.ts'
 // in the lib dir doesn't have access to it there
 interface BackgroundSyncEvent extends ExtendableEvent {
@@ -68,7 +124,7 @@ self.addEventListener('sync', (event: BackgroundSyncEvent) => {
 
   if (event.lastChance) {
     // TODO: store in indexedDb or alert user to retry?
-
+    // import the indexedDb logic from the background sync branch
   }
 
   async function sendMessage(message: Record<string, string>) {
@@ -78,42 +134,10 @@ self.addEventListener('sync', (event: BackgroundSyncEvent) => {
   }
 });
 
-self.addEventListener('fetch', (event) => {
-	// ignore POST requests etc
-	if (event.request.method !== 'GET') return;
-
-	async function respond() {
-		const url = new URL(event.request.url);
-		const cache = await caches.open(CACHE);
-
-		// `build`/`files` can always be served from the cache
-		if (ASSETS.includes(url.pathname)) {
-			const response = await cache.match(url.pathname);
-
-			if (response) {
-				return response;
-			}
-		}
-      const response = await fetchFromCacheFirst({
-        event,
-        cache,
-    });
-
-      return response;
-	}
-
-	event.respondWith(respond());
-});
-
 async function enableNavigationPreloadIfAvailable() {
   if (self.registration.navigationPreload) {
     await self.registration.navigationPreload.enable();
   }
-}
-
-interface CacheFirst {
-  event: FetchEvent,
-  cache: Cache,
 }
 
 async function putInCache(request, response) {
@@ -121,53 +145,3 @@ async function putInCache(request, response) {
   const cache = await caches.open(CACHE);
   await cache.put(request, response);
 };
-
-async function fetchFromCacheFirst({
-  event,
-  cache,
-}: CacheFirst) {
-  const { request, preloadResponse } = event;
-  // try the cache first, but
-  // fall back to the network
-  try {
-    const response = await cache.match(request);
-
-    if (response) {
-      return response;
-    }
-
-    // if there's no cache, then just error out
-    // as there is nothing we can do to respond to this request
-    throw new Error('Cache miss');
-  } catch (err) {
-    console.log(err);
-
-    const preloadRes = await preloadResponse; 
-    if (preloadRes) {
-      console.log(`using preload response: ${preloadRes}`);
-
-      event.waitUntil(putInCache(request, preloadRes.clone()));
-      return preloadRes;
-    }
-
-    const response = await fetch(request);
-    // if we're offline, fetch can return a value that is not a Response
-    // instead of throwing - and we can't pass this non-Response to respondWith
-    if (!(response instanceof Response)) {
-      // TODO: return a fallback template and throw this error if fallback
-      // can't be reached?
-      // TODO: where did I get this throw error from? I think this needs to 
-      // be a Response instance... Oh... I got this from the sveltekit boilerplate
-      // code... I think it's here so that the svelte error handler can trigger
-      // the svelte error page
-      throw new Error('invalid response from fetch');
-    }
-
-    if (response.status === 200) {
-      event.waitUntil(putInCache(request, response.clone()));
-    }
-
-    return response;
-  }
-}
-

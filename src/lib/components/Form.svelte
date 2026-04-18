@@ -23,6 +23,53 @@
   let formData: FormProps = $props();
 
   const submitFormLater = async () => {
+    /* 
+      The basic pattern that IndexedDB encourages is the following:
+
+      1. Open a database.
+      2. Create an object store in the database.
+      3. Start a transaction and make a request to do some database operation, like adding or retrieving data.
+      4. Wait for the operation to complete by listening to the right kind of DOM event.
+      5. Do something with the results (which can be found on the request object). 
+    */
+
+    const localDbRequest = indexedDB.open('formSubmissions', 1)
+    let localDb: IDBDatabase;
+    localDbRequest.onerror = (event) => console.error('error opening db', event);
+    localDbRequest.onsuccess = (event) =>  {
+      console.log(`Database initialized. event: ${event}`);
+
+      localDb = localDbRequest.result;
+      // if the indexedDB is being created for the first time or version number changes,
+      // the "onupgradeneeded" event will fire first where the objectStores are
+      // created/deleted/updated, then the indexedDB open request "onsuccess" event will fire;
+      // otherwise, the "onsuccess" will fire immediately if the indexedDB version already exists.
+      const transaction = localDb.transaction(['pendingSubmissions'], 'readwrite');
+      const tx = transaction.objectStore('pendingSubmissions');
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { formCallback, ...data } = formData;
+      const formDataSnapshot = $state.snapshot(data);
+      tx.add(formDataSnapshot);
+
+      transaction.oncomplete = (event) => {
+        console.log(`transaction complete: ${event}`);
+      }
+
+      transaction.onerror = (event) => {
+        console.error(`transaction failure, not sure what to do yet...: ${event}`);
+      }
+    }
+    // onupgradeneeded is the only place where you can alter the structure of the database.
+    // In it, you can create and delete object stores and build and remove indices.
+    // The event is only dispatched on creation of a new indexedDB or a db version change.
+    localDbRequest.onupgradeneeded = (event) => {
+      console.log(`in onUpgradeNeeded: ${event}`);
+      // @ts-expect-error TODO: create a custom type
+      event.target.result.createObjectStore('pendingSubmissions', { autoIncrement: true });
+    }
+
+
     const registration: ServiceWorkerBackgroundSync = await navigator.serviceWorker.ready;
     try {
       if (!registration.sync) {

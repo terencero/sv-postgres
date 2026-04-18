@@ -71,6 +71,7 @@
       <div id={`${String(todo.id)}-${todo.title}`}>
         <form method="POST" action="?/completeTodo" use:enhance>
           <input type="hidden" name="id" value={todo.id} />
+
           <p><b>Title: </b>{todo.title}</p>
           <p><b>Due Date: </b>{todo.dueDate} at {todo.dueTime}</p>
           <p><b>Done: </b>
@@ -84,21 +85,26 @@
           <p><b>Repeats: </b>{todo.repeats || "once"}</p>
           <p><b>Label: </b>{todo.label}</p>
           <p><b>Notes: </b>{todo.notes}</p>
+
           <button aria-label="Mark Complete">Mark Complete</button>
         </form>
+
         <button>remind me</button>
+
         <form method="POST" action="?/deleteTodo" use:enhance>
           <input type="hidden" name="id" value={todo.id} />
           <button aria-label="Delete">Delete</button>
         </form>
+
         <button onclick={() => handleEditClick(todo.id)}>
           {showUpdateForm.has(todo.id) ? 'hide' : 'edit'}
         </button>
+
         {#if showUpdateForm.has(todo.id)}
           <Form
             data={todo}
             {...FormTypes.update}
-            fields={[{ label: 'id: ', type: 'hidden', name: 'id', value: String(todo.id) }, ...formFields]}
+            fields={[{ type: 'hidden', name: 'id', value: String(todo.id) }, ...formFields]}
             submitText='edit'
             {formCallback}
           />
