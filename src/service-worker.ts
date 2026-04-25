@@ -137,7 +137,8 @@ self.addEventListener('sync', (event: BackgroundSyncEvent) => {
 self.addEventListener('message', (event) => {
   console.log(`message from client: ${event}`);
 
-  const form = event.data;
+  const key = event.data.id;
+  const form = event.data.value;
   const formData = new FormData();
   Object.entries(form.data).forEach(([k, v]) => formData.set(k, v as string));
 
@@ -147,6 +148,11 @@ self.addEventListener('message', (event) => {
         method: form.method,
         body: formData,
       });
+
+      if (res.status >= 200 && res.status <= 299) {
+        // delete from indexedDb
+        removeFromIDB(key);
+      }
       return res;
     } catch (e) {
       console.error(`failed to fetch in sw: ${e}`);
@@ -155,6 +161,32 @@ self.addEventListener('message', (event) => {
 
   event.waitUntil(postForm());
 });
+
+function removeFromIDB(key: number) {
+  const localDbRequest = indexedDB.open('formSubmissions', 1)
+  let localDb: IDBDatabase;
+  localDbRequest.onerror = (event) => console.error('error opening db', event);
+  localDbRequest.onsuccess = (event) => {
+    console.log(`Database initialized. event: ${event}`);
+
+    localDb = localDbRequest.result;
+    // if the indexedDB is being created for the first time or version number changes,
+    // the "onupgradeneeded" event will fire first where the objectStores are
+    // created/deleted/updated, then the indexedDB open request "onsuccess" event will fire;
+    // otherwise, the "onsuccess" will fire immediately if the indexedDB version already exists.
+    const transaction = localDb.transaction(['pendingSubmissions'], 'readwrite');
+    const tx = transaction.objectStore('pendingSubmissions');
+
+    tx.delete(key)
+
+    transaction.oncomplete = (evt) => {
+      console.log(`successfully deleted db entry: ${evt}`);
+    }
+    transaction.onerror = (evt) => {
+      console.error(`failed to delete db entry: ${evt}`);
+    }
+  }
+}
 
 async function enableNavigationPreloadIfAvailable() {
   if (self.registration.navigationPreload) {

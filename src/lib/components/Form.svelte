@@ -41,7 +41,8 @@
           console.log(`found record: ${cursor}`);
           // TODO: try submitting form straight from svelte
           navigator.serviceWorker.ready.then(registration => {
-            registration.active?.postMessage(cursor.value);
+            const messageBody = { id: cursor.key, value: cursor.value }
+            registration.active?.postMessage(messageBody);
           });
           cursor.continue();
         } else {
