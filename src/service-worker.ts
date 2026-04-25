@@ -134,6 +134,33 @@ self.addEventListener('sync', (event: BackgroundSyncEvent) => {
   }
 });
 
+self.addEventListener('message', (event) => {
+  console.log(`message from client: ${event}`);
+
+  const form = event.data;
+  const formData = new FormData();
+  Object.entries(form.data).forEach(([k, v]) => formData.set(k, v as string));
+
+  // TODO: post the form data within event
+  async function postForm() {
+    try {
+      // TODO: need to properly route to svelte server action;
+      // need to get the formData values out?
+      // const action = formData.action.replace('?', '');
+      // const serialized = new FormData(formData);
+      const res = await fetch(form.action, {
+        method: form.method,
+        body: formData,
+      });
+      return res;
+    } catch (e) {
+      console.error(`failed to fetch in sw: ${e}`);
+    }
+  }
+
+  event.waitUntil(postForm());
+});
+
 async function enableNavigationPreloadIfAvailable() {
   if (self.registration.navigationPreload) {
     await self.registration.navigationPreload.enable();

@@ -1,3 +1,4 @@
+<svelte:window ononline={handleResync} />
 <script lang="ts">
 	import { enhance } from "$app/forms";
 	import type { ServiceWorkerBackgroundSync } from "$lib/extended-types/extended-types";
@@ -18,11 +19,41 @@
     fields: Field[];
   }
 
-  type FormData = Todos | Supplies;
-  type FormProps = FormFields & { data?: FormData, formCallback?: () => void };
-  let formData: FormProps = $props();
+  type FormDataTypes = Todos | Supplies;
+  type FormProps = FormFields & { data?: FormDataTypes, formCallback?: () => void };
+  let formProps: FormProps = $props();
 
-  const submitFormLater = async () => {
+  const handleResync = () => {
+    console.log(`resyncing`);
+
+    const localDbRequest = indexedDB.open('formSubmissions', 1);
+    let localDb: IDBDatabase;
+    localDbRequest.onerror = (event) => console.error('error opening db', event);
+    localDbRequest.onsuccess = (event) => {
+      console.log(`Database initialized in resync. event: ${event}`);
+      localDb = localDbRequest.result;
+
+      const objectStore = localDb.transaction(['pendingSubmissions'], 'readwrite').objectStore('pendingSubmissions');
+      objectStore.openCursor().onsuccess = (event) => {
+        // @ts-expect-error TODO: create a custom type
+        const cursor = event.target.result;
+        if (cursor) {
+          console.log(`found record: ${cursor}`);
+          // TODO: try submitting form straight from svelte
+          navigator.serviceWorker.ready.then(registration => {
+            registration.active?.postMessage(cursor.value);
+          });
+          cursor.continue();
+        } else {
+          console.log('no more entries.');
+        }
+      }
+      // tx.oncomplete = (event) => console.log(`resync transaction complete: ${event}`);
+      // tx.onerror = (event) => console.error(`failed to resync transaction: ${event}`);
+    }
+  }
+
+  const submitFormLater = async (formData: FormData) => {
     /* 
       The basic pattern that IndexedDB encourages is the following:
 
@@ -36,7 +67,7 @@
     const localDbRequest = indexedDB.open('formSubmissions', 1)
     let localDb: IDBDatabase;
     localDbRequest.onerror = (event) => console.error('error opening db', event);
-    localDbRequest.onsuccess = (event) =>  {
+    localDbRequest.onsuccess = (event) => {
       console.log(`Database initialized. event: ${event}`);
 
       localDb = localDbRequest.result;
@@ -47,10 +78,13 @@
       const transaction = localDb.transaction(['pendingSubmissions'], 'readwrite');
       const tx = transaction.objectStore('pendingSubmissions');
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { formCallback, ...data } = formData;
-      const formDataSnapshot = $state.snapshot(data);
-      tx.add(formDataSnapshot);
+      const formAttributes = {
+        action: formProps.action,
+        method: formProps.method,
+        // sending in POJO because transactions need clonable objects
+        data: formData.entries().reduce((acc, [k, v]) => ({ [k]: v, ...acc }), {}),
+      };
+      tx.add(formAttributes);
 
       transaction.oncomplete = (event) => {
         console.log(`transaction complete: ${event}`);
@@ -82,20 +116,20 @@
 
       // TODO: fallback option: use indexedDb to manually transact data to be fetched later 
     }
-  } 
+  }
 </script>
 
-<form action={formData.action} method={formData.method} use:enhance={() => (
-  async ({ update }) => {
+<form action={formProps.action} method={formProps.method} use:enhance={() => (
+  async ({ update, formData }) => {
     if (!navigator.onLine) {
-      await submitFormLater();
+      await submitFormLater(formData);
       return;
     }
     await update();
-    formData.formCallback?.();
+    formProps.formCallback?.();
   }
 )}>
-  {#each formData.fields as { label, type, name, value = formData.data?.[name as keyof (Todos | Supplies)] || '', selectOptions = [''] } (name)}
+  {#each formProps.fields as { label, type, name, value, selectOptions = [''] } (name)}
     {#if type === 'hidden'}
       <input {type} {name} {value} />
     {:else}
@@ -117,7 +151,7 @@
       </label>
     {/if}
   {/each}
-  <button aria-label={formData.submitText}>{formData.submitText}</button>
+  <button aria-label={formProps.submitText}>{formProps.submitText}</button>
 </form>
 
 <style>
