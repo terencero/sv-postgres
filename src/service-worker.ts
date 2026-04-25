@@ -141,13 +141,8 @@ self.addEventListener('message', (event) => {
   const formData = new FormData();
   Object.entries(form.data).forEach(([k, v]) => formData.set(k, v as string));
 
-  // TODO: post the form data within event
   async function postForm() {
     try {
-      // TODO: need to properly route to svelte server action;
-      // need to get the formData values out?
-      // const action = formData.action.replace('?', '');
-      // const serialized = new FormData(formData);
       const res = await fetch(form.action, {
         method: form.method,
         body: formData,

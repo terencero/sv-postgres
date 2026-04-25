@@ -19,8 +19,8 @@
     fields: Field[];
   }
 
-  type FormDataTypes = Todos | Supplies;
-  type FormProps = FormFields & { data?: FormDataTypes, formCallback?: () => void };
+  type FormDataTypes = { data: Todos | Supplies };
+  type FormProps = FormFields & FormDataTypes & { formCallback?: () => void };
   let formProps: FormProps = $props();
 
   const handleResync = () => {
@@ -48,8 +48,6 @@
           console.log('no more entries.');
         }
       }
-      // tx.oncomplete = (event) => console.log(`resync transaction complete: ${event}`);
-      // tx.onerror = (event) => console.error(`failed to resync transaction: ${event}`);
     }
   }
 
@@ -129,7 +127,13 @@
     formProps.formCallback?.();
   }
 )}>
-  {#each formProps.fields as { label, type, name, value, selectOptions = [''] } (name)}
+  <!--
+    destructure all of the form fields from component prop then use the name field,
+    which matches the data fields loaded from the server "i.e. Todos or Supplies" and passed
+    into the component props under "data", use the the data values to prepopulate edit forms,
+    else default to an empty string
+  -->
+  {#each formProps.fields as { label, type, name, value = formProps.data?.[name as keyof (Todos | Supplies) || ''], selectOptions = [''] } (name)}
     {#if type === 'hidden'}
       <input {type} {name} {value} />
     {:else}
