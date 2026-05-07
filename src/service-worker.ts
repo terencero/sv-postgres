@@ -20,20 +20,20 @@ const CACHE = `cache-${version}`;
 
 const ASSETS = [
 	...build, // the app itself
-	...files  // everything in `static`
+	...files, // everything in `static`
 ];
 
 self.addEventListener('install', (event) => {
-  console.log('installing sw')
+	console.log('installing sw');
 	// Create a new cache and add all files to it
 	async function addFilesToCache() {
-    try {
-      const cache = await caches.open(CACHE);
-      await cache.addAll(ASSETS);
-      console.log(`assets: ${ASSETS}\n build: ${build}\n files: ${files}\n version: ${version}`);
-    } catch(e) {
-      console.error(`cache open or addall failure: ${e}`)
-    }
+		try {
+			const cache = await caches.open(CACHE);
+			await cache.addAll(ASSETS);
+			console.log(`assets: ${ASSETS}\n build: ${build}\n files: ${files}\n version: ${version}`);
+		} catch (e) {
+			console.error(`cache open or addall failure: ${e}`);
+		}
 	}
 
 	event.waitUntil(addFilesToCache());
@@ -47,7 +47,7 @@ self.addEventListener('activate', (event) => {
 		}
 	}
 
-  event.waitUntil(enableNavigationPreloadIfAvailable());
+	event.waitUntil(enableNavigationPreloadIfAvailable());
 	event.waitUntil(deleteOldCaches());
 });
 
@@ -68,41 +68,41 @@ self.addEventListener('fetch', (event) => {
 			}
 		}
 
-    // for everything else, try the network first, but
-    // fall back to the cache if we're offline
-    try {
-      // try preload response first to run the network in parallel while the
-      // service worker boots up
-      const preloadResponse = await Promise.resolve(event.preloadResponse);
-      if (preloadResponse) {
-        await putInCache(event.request, preloadResponse.clone());
-        return preloadResponse;
-      }
+		// for everything else, try the network first, but
+		// fall back to the cache if we're offline
+		try {
+			// try preload response first to run the network in parallel while the
+			// service worker boots up
+			const preloadResponse = await Promise.resolve(event.preloadResponse);
+			if (preloadResponse) {
+				await putInCache(event.request, preloadResponse.clone());
+				return preloadResponse;
+			}
 
-      const response = await fetch(event.request);
+			const response = await fetch(event.request);
 
-      // if we're offline, fetch can return a value that is not a Response
-      // instead of throwing - and we can't pass this non-Response to respondWith
-      if (!(response instanceof Response)) {
-        throw new Error('invalid response from fetch');
-      }
+			// if we're offline, fetch can return a value that is not a Response
+			// instead of throwing - and we can't pass this non-Response to respondWith
+			if (!(response instanceof Response)) {
+				throw new Error('invalid response from fetch');
+			}
 
-      if (response.status === 200) {
-        cache.put(event.request, response.clone());
-      }
+			if (response.status === 200) {
+				cache.put(event.request, response.clone());
+			}
 
-      return response;
-    } catch (err) {
-      const response = await cache.match(event.request);
+			return response;
+		} catch (err) {
+			const response = await cache.match(event.request);
 
-      if (response) {
-        return response;
-      }
-      // if there's no cache, then just error out
-      // as there is nothing we can do to respond to this request
-      throw err;
-    }
-  }
+			if (response) {
+				return response;
+			}
+			// if there's no cache, then just error out
+			// as there is nothing we can do to respond to this request
+			throw err;
+		}
+	}
 
 	event.respondWith(respond());
 });
@@ -110,92 +110,92 @@ self.addEventListener('fetch', (event) => {
 // INFO: keeping this interface here because 'extended-types.d.ts'
 // in the lib dir doesn't have access to it there
 interface BackgroundSyncEvent extends ExtendableEvent {
-  tag: string;
-  lastChance: boolean;
+	tag: string;
+	lastChance: boolean;
 }
 
 // @ts-expect-error background sync isn't typed in sveltekit?
 self.addEventListener('sync', (event: BackgroundSyncEvent) => {
-  if (event.tag && event.tag === 'add-todo-or-supply') {
-    // TODO: forward to fetch? will backgroundSync just handle the network
-    // connectivity?
-    // event.waitUntil(fetch())
-  }
+	if (event.tag && event.tag === 'add-todo-or-supply') {
+		// TODO: forward to fetch? will backgroundSync just handle the network
+		// connectivity?
+		// event.waitUntil(fetch())
+	}
 
-  if (event.lastChance) {
-    // TODO: store in indexedDb or alert user to retry?
-    // import the indexedDb logic from the background sync branch
-  }
+	if (event.lastChance) {
+		// TODO: store in indexedDb or alert user to retry?
+		// import the indexedDb logic from the background sync branch
+	}
 
-  async function sendMessage(message: Record<string, string>) {
-    const clients = await self.clients.matchAll();
+	async function sendMessage(message: Record<string, string>) {
+		const clients = await self.clients.matchAll();
 
-    clients.forEach(client => client.postMessage(message));
-  }
+		clients.forEach((client) => client.postMessage(message));
+	}
 });
 
 self.addEventListener('message', (event) => {
-  console.log(`message from client: ${event}`);
+	console.log(`message from client: ${event}`);
 
-  const key = event.data.id;
-  const form = event.data.value;
-  const formData = new FormData();
-  Object.entries(form.data).forEach(([k, v]) => formData.set(k, v as string));
+	const key = event.data.id;
+	const form = event.data.value;
+	const formData = new FormData();
+	Object.entries(form.data).forEach(([k, v]) => formData.set(k, v as string));
 
-  async function postForm() {
-    try {
-      const res = await fetch(form.action, {
-        method: form.method,
-        body: formData,
-      });
+	async function postForm() {
+		try {
+			const res = await fetch(form.action, {
+				method: form.method,
+				body: formData,
+			});
 
-      if (res.status >= 200 && res.status <= 299) {
-        // delete from indexedDb
-        removeFromIDB(key);
-      }
-      return res;
-    } catch (e) {
-      console.error(`failed to fetch in sw: ${e}`);
-    }
-  }
+			if (res.status >= 200 && res.status <= 299) {
+				// delete from indexedDb
+				removeFromIDB(key);
+			}
+			return res;
+		} catch (e) {
+			console.error(`failed to fetch in sw: ${e}`);
+		}
+	}
 
-  event.waitUntil(postForm());
+	event.waitUntil(postForm());
 });
 
 function removeFromIDB(key: number) {
-  const localDbRequest = indexedDB.open('formSubmissions', 1)
-  let localDb: IDBDatabase;
-  localDbRequest.onerror = (event) => console.error('error opening db', event);
-  localDbRequest.onsuccess = (event) => {
-    console.log(`Database initialized. event: ${event}`);
+	const localDbRequest = indexedDB.open('formSubmissions', 1);
+	let localDb: IDBDatabase;
+	localDbRequest.onerror = (event) => console.error('error opening db', event);
+	localDbRequest.onsuccess = (event) => {
+		console.log(`Database initialized. event: ${event}`);
 
-    localDb = localDbRequest.result;
-    // if the indexedDB is being created for the first time or version number changes,
-    // the "onupgradeneeded" event will fire first where the objectStores are
-    // created/deleted/updated, then the indexedDB open request "onsuccess" event will fire;
-    // otherwise, the "onsuccess" will fire immediately if the indexedDB version already exists.
-    const transaction = localDb.transaction(['pendingSubmissions'], 'readwrite');
-    const tx = transaction.objectStore('pendingSubmissions');
+		localDb = localDbRequest.result;
+		// if the indexedDB is being created for the first time or version number changes,
+		// the "onupgradeneeded" event will fire first where the objectStores are
+		// created/deleted/updated, then the indexedDB open request "onsuccess" event will fire;
+		// otherwise, the "onsuccess" will fire immediately if the indexedDB version already exists.
+		const transaction = localDb.transaction(['pendingSubmissions'], 'readwrite');
+		const tx = transaction.objectStore('pendingSubmissions');
 
-    tx.delete(key)
+		tx.delete(key);
 
-    transaction.oncomplete = (evt) => {
-      console.log(`successfully deleted db entry: ${evt}`);
-    }
-    transaction.onerror = (evt) => {
-      console.error(`failed to delete db entry: ${evt}`);
-    }
-  }
+		transaction.oncomplete = (evt) => {
+			console.log(`successfully deleted db entry: ${evt}`);
+		};
+		transaction.onerror = (evt) => {
+			console.error(`failed to delete db entry: ${evt}`);
+		};
+	};
 }
 
 async function enableNavigationPreloadIfAvailable() {
-  if (self.registration.navigationPreload) {
-    await self.registration.navigationPreload.enable();
-  }
+	if (self.registration.navigationPreload) {
+		await self.registration.navigationPreload.enable();
+	}
 }
 
 async function putInCache(request, response) {
-  console.log('putting in cache')
-  const cache = await caches.open(CACHE);
-  await cache.put(request, response);
-};
+	console.log('putting in cache');
+	const cache = await caches.open(CACHE);
+	await cache.put(request, response);
+}

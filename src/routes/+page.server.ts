@@ -15,7 +15,7 @@ export const actions: Actions = {
 
 		if (!validateUsername(username)) {
 			return fail(400, {
-				message: 'Invalid username (min 3, max 31 characters, alphanumeric only)'
+				message: 'Invalid username (min 3, max 31 characters, alphanumeric only)',
 			});
 		}
 		if (!validatePassword(password)) {
@@ -33,7 +33,7 @@ export const actions: Actions = {
 			memoryCost: 19456,
 			timeCost: 2,
 			outputLen: 32,
-			parallelism: 1
+			parallelism: 1,
 		});
 		if (!validPassword) {
 			return fail(400, { message: 'Incorrect username or password' });
@@ -63,7 +63,7 @@ export const actions: Actions = {
 			memoryCost: 19456,
 			timeCost: 2,
 			outputLen: 32,
-			parallelism: 1
+			parallelism: 1,
 		});
 
 		try {
@@ -85,7 +85,7 @@ export const actions: Actions = {
 		auth.deleteSessionTokenCookie(event);
 
 		return redirect(302, '/');
-	}
+	},
 };
 
 function generateUserId() {
