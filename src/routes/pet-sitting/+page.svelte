@@ -3,10 +3,11 @@
 	import Form from '$lib/components/Form.svelte';
 	import type { FormFields } from '$lib/components/Form.svelte';
 	import MappedPetItems from '$lib/components/MappedPetItems.svelte';
-	import { PetSitters } from '$lib/server/db/schema.js';
+	import { type PetSitters } from '$lib/server/db/schema.js';
 	import { SvelteSet } from 'svelte/reactivity';
+	import type { PageProps } from './$types';
 
-  let { data, form } = $props();
+	let { data }: PageProps = $props();
 
 	let showCreateForm = $state(false);
 	let showUpdateForm = new SvelteSet<number>();
@@ -37,33 +38,39 @@
 		<h2>Scheduled Sitters</h2>
 		<button>Add a Sitter</button>
 
-    <MappedPetItems pets={data.pets || []} items={data.petSitters || []} {card} />
-    {#snippet card(pet: string, petSitters: PetSitters[])}
-      
-    {/snippet}
-		<article class="sitter-card">
-			<h3>Sitter Details</h3>
-			<div>
-				<h4>Sitter Dates:</h4>
-				<p>05/05-05/10</p>
-			</div>
-			<div>
-				<h4>Name:</h4>
-				<p>"sally"</p>
-			</div>
-			<div>
-				<h4>Phone Number:</h4>
-				<p>123-456-7089</p>
-			</div>
-			<div>
-				<h4>Address:</h4>
-				<p>123 street street</p>
-			</div>
-			<div>
-				<h4>email:</h4>
-				<p>some-email@test.com</p>
-			</div>
-		</article>
+		{#if !data.pets || !data.petSitters.length}
+			'No Pets Have a Pet Sitter Reserved Yet.'
+		{:else}
+			<MappedPetItems pets={data.pets || []} items={data.petSitters || []} {card} />
+			{#snippet card(pet: string, petSitters: PetSitters[] | [])}
+				{#each petSitters as sitter (sitter?.id)}
+					<article class="sitter-card">
+						{pet}
+						<h3>Sitter Details</h3>
+						<div>
+							<h4>Sitter Dates:</h4>
+							<p>{sitter?.sitterStartDate || '05/05'} - {sitter.sitterEndDate || '05/10'}</p>
+						</div>
+						<div>
+							<h4>Name:</h4>
+							<p>{sitter.sitterName || 'sally'}</p>
+						</div>
+						<div>
+							<h4>Phone Number:</h4>
+							<p>123-456-7089</p>
+						</div>
+						<div>
+							<h4>Address:</h4>
+							<p>123 street street</p>
+						</div>
+						<div>
+							<h4>email:</h4>
+							<p>some-email@test.com</p>
+						</div>
+					</article>
+				{/each}
+			{/snippet}
+		{/if}
 	</article>
 	<Form fields={formFields} {...FormTypes.create} submitText="Add Sitter" {formCallback} />
 </article>
