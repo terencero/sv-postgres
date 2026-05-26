@@ -2,25 +2,16 @@
 	import { enhance } from '$app/forms';
 	import type { ServiceWorkerBackgroundSync } from '$lib/extended-types/extended-types';
 	import type { Supplies, Todos } from '$lib/server/db/schema';
+	import type { Snippet } from 'svelte';
 	import type { HTMLFormAttributes } from 'svelte/elements';
 
-	interface Field {
-		label?: string;
-		type: HTMLInputElement['type'];
-		name: HTMLInputElement['name'];
-		value?: HTMLInputElement['value'];
-		selectOptions?: string[];
-	}
-	export interface FormFields {
-		action: string;
+	interface Props {
+		action: HTMLFormAttributes['action'];
 		method: HTMLFormAttributes['method'];
-		submitText: string;
-		fields: Field[];
+		children: Snippet;
+		formCallback: () => void;
 	}
-
-	type FormDataTypes = { data?: Todos | Supplies };
-	type FormProps = FormFields & FormDataTypes & { formCallback?: () => void };
-	let formProps: FormProps = $props();
+	let { children, action, method, formCallback }: Props = $props();
 
 	const handleResync = () => {
 		console.log(`resyncing`);
@@ -79,8 +70,8 @@
 			const tx = transaction.objectStore('pendingSubmissions');
 
 			const formAttributes = {
-				action: formProps.action,
-				method: formProps.method,
+				action,
+				method,
 				// sending in POJO because transactions need clonable objects
 				data: formData.entries().reduce((acc, [k, v]) => ({ [k]: v, ...acc }), {}),
 			};
@@ -121,8 +112,8 @@
 <svelte:window ononline={handleResync} />
 
 <form
-	action={formProps.action}
-	method={formProps.method}
+	{action}
+	{method}
 	use:enhance={() =>
 		async ({ update, formData }) => {
 			if (!navigator.onLine) {
@@ -130,38 +121,10 @@
 				return;
 			}
 			await update();
-			formProps.formCallback?.();
+			formCallback?.();
 		}}
 >
-	<!--
-    destructure all of the form fields from component prop then use the name field,
-    which matches the data fields loaded from the server "i.e. Todos or Supplies" and passed
-    into the component props under "data", use the the data values to prepopulate edit forms,
-    else default to an empty string
-  -->
-	{#each formProps.fields as fields (fields.name)}
-		{#if fields.type === 'hidden'}
-			<input type={fields.type} name={fields.name} value={fields.value} />
-		{:else}
-			<label>
-				{fields.label}
-				{#if fields.type === 'select'}
-					<select name={fields.name} bind:value={fields.value}>
-						{#each fields.selectOptions as option (option)}
-							<option value={option}>{option}</option>
-						{/each}
-					</select>
-				{:else if fields.type === 'textarea'}
-					<textarea name={fields.name}>
-						{fields.value}
-					</textarea>
-				{:else}
-					<input type={fields.type} name={fields.name} value={fields.value} />
-				{/if}
-			</label>
-		{/if}
-	{/each}
-	<button aria-label={formProps.submitText}>{formProps.submitText}</button>
+	{@render children?.()}
 </form>
 
 <style>

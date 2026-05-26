@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Form, { type FormFields } from '$lib/components/Form.svelte';
+	import Form from '$lib/components/Form.svelte';
 	import { page } from '$app/state';
 	import type { Supplies } from '$lib/server/db/schema';
 	import MappedPetItems from '$lib/components/MappedPetItems.svelte';
@@ -9,29 +9,6 @@
 	let { data, form } = $props();
 	let showCreateForm = $state(false);
 	let showUpdateForm = new SvelteSet<number>();
-
-	const FormTypes = {
-		create: {
-			method: 'POST',
-			action: `${page.route.id}?/addNewSupply`,
-		},
-		update: {
-			method: 'POST',
-			action: `${page.route.id}?/updateSupply`,
-		},
-	} as const;
-
-	let formFields: FormFields['fields'] = [
-		{ label: 'What kind of supply? ex: food or litter', type: 'text', name: 'supplyType' },
-		{ label: 'How many or much?', type: 'number', name: 'inventory' },
-		{ label: 'Description ex: jrand', type: 'text', name: 'description' },
-		{
-			label: 'Supply for:',
-			type: 'select',
-			name: 'petName',
-			selectOptions: (data.pets || []).map(({ name }) => name || ''),
-		},
-	];
 
 	const handleEditClick = (supplyId: number) => {
 		if (showUpdateForm.has(supplyId)) {
@@ -53,7 +30,51 @@
 </script>
 
 <h1>Pet Supplies</h1>
+
+<button onclick={() => (showCreateForm = !showCreateForm)}>
+	{#if showCreateForm}
+		Hide Form
+	{:else}
+		Add a supply
+	{/if}
+</button>
+
+{#if showCreateForm}
+	<Form action={`${page.route.id}?/addNewSupply`} method="POST" {formCallback}>
+		{@render formContents()}
+		<button aria-label="add supply">Add Supply</button>
+	</Form>
+{/if}
+
 <MappedPetItems pets={data.pets || []} items={data.supplies || []} {card} />
+
+{#snippet formContents(supply?: Supplies)}
+  {#if supply}
+    <input type="text" hidden value={supply.id}>
+  {/if}
+	<label>
+		'What kind of supply? ex: food or litter'
+		<input type="text" name="supplyType" value={supply?.supplyType || ''} />
+	</label>
+	<label>
+		How many or much?
+		<input type="number" name="inventory" value={supply?.inventory || ''} />
+	</label>
+	<label>
+		Description ex: brand
+		<input type="text" name="description" value={supply?.description || ''} />
+	</label>
+	{#if !supply}
+		<label>
+			Supply for:
+			<select name="petName">
+				{#each (data.pets || []).map(({ name }) => name || '') as option (option)}
+					<option>{option}</option>
+				{/each}
+			</select>
+		</label>
+	{/if}
+{/snippet}
 
 {#snippet card(pet: string, supplies: Supplies[])}
 	<div>
@@ -73,32 +94,15 @@
 					{showUpdateForm.has(supply.id) ? 'hide' : 'edit'}
 				</button>
 				{#if showUpdateForm.has(supply.id)}
-					<Form
-						data={supply}
-						{...FormTypes.update}
-						fields={[
-							{ label: 'id', type: 'hidden', name: 'id', value: String(supply.id) },
-							...formFields,
-						]}
-						submitText="edit"
-						{formCallback}
-					/>
+					<Form action={`${page.route.id}?/updateSupply`} method="POST" {formCallback}>
+            {@render formContents(supply)}
+            <button aria-label="edit">edit</button>
+          </Form>
 				{/if}
 			</div>
 		{/each}
 	</div>
 {/snippet}
-
-<button onclick={() => (showCreateForm = !showCreateForm)}>
-	{#if showCreateForm}
-		Hide Form
-	{:else}
-		Add a supply
-	{/if}
-</button>
-{#if showCreateForm}
-	<Form fields={formFields} {...FormTypes.create} submitText="Add a supply" {formCallback} />
-{/if}
 
 <style>
 	div {
