@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { ServiceWorkerBackgroundSync } from '$lib/extended-types/extended-types';
-	import type { Supplies, Todos } from '$lib/server/db/schema';
 	import type { Snippet } from 'svelte';
 	import type { HTMLFormAttributes } from 'svelte/elements';
 

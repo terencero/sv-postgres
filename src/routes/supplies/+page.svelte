@@ -49,9 +49,9 @@
 <MappedPetItems pets={data.pets || []} items={data.supplies || []} {card} />
 
 {#snippet formContents(supply?: Supplies)}
-  {#if supply}
-    <input type="text" hidden value={supply.id}>
-  {/if}
+	{#if supply}
+		<input type="hidden" name="id" value={supply.id} />
+	{/if}
 	<label>
 		'What kind of supply? ex: food or litter'
 		<input type="text" name="supplyType" value={supply?.supplyType || ''} />
@@ -83,21 +83,21 @@
 			<div>
 				<form action="?/deleteSupply" method="POST" use:enhance>
 					<input type="hidden" name="id" value={supply.id} />
-
 					<p><b>Supply Type:</b> {supply.supplyType}</p>
 					<p><b>Inventory:</b> {supply.inventory}</p>
 					<p><b>Description:</b> {supply.description}</p>
-
 					<button aria-label="Delete Supply">Delete Supply</button>
 				</form>
+
 				<button onclick={() => handleEditClick(supply.id)}>
 					{showUpdateForm.has(supply.id) ? 'hide' : 'edit'}
 				</button>
+
 				{#if showUpdateForm.has(supply.id)}
 					<Form action={`${page.route.id}?/updateSupply`} method="POST" {formCallback}>
-            {@render formContents(supply)}
-            <button aria-label="edit">edit</button>
-          </Form>
+						{@render formContents(supply)}
+						<button aria-label="edit">edit</button>
+					</Form>
 				{/if}
 			</div>
 		{/each}

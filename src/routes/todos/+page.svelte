@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import Form, { type FormFields } from '$lib/components/Form.svelte';
+	import Form from '$lib/components/Form.svelte';
 	import type { Todos } from '$lib/server/db/schema';
 	import roundCheck from '$lib/assets/roundCheck.svg';
 	import roundX from '$lib/assets/roundX.svg';
@@ -9,37 +9,10 @@
 	import { SvelteSet } from 'svelte/reactivity';
 	import { enhance } from '$app/forms';
 
-	const FormTypes = {
-		create: {
-			method: 'POST',
-			action: `${page.route.id}?/addNewTodo`,
-		},
-		update: {
-			method: 'POST',
-			action: `${page.route.id}?/updateTodo`,
-		},
-	} as const;
-
 	let { data, form }: PageProps = $props();
 	let showCreateForm = $state(false);
 	let showEnableNotification = $state(false);
 	let showUpdateForm = new SvelteSet<number>();
-
-	const formFields: FormFields['fields'] = [
-		{ label: 'Todo Title: ', type: 'text', name: 'title' },
-		{ label: 'Due Date: ', type: 'date', name: 'dueDate' },
-		{ label: 'Due Time: ', type: 'time', name: 'dueTime' },
-		{ label: 'Done: ', type: 'checkbox', name: 'complete' },
-		{
-			label: 'Repeats: ',
-			type: 'select',
-			name: 'repeats',
-			selectOptions: ['daily', 'weekly', 'monthly', 'yearly'],
-		},
-		{ label: 'Label: ', type: 'text', name: 'label' },
-		{ label: 'Notes: ', type: 'textarea', name: 'notes' },
-		{ label: 'For my pet: ', type: 'text', name: 'petName' },
-	];
 
 	const handleEditClick = (todoId: number) => {
 		if (showUpdateForm.has(todoId)) {
@@ -82,7 +55,72 @@
 
 <button class={{ showEnableNotification }}>Enable Notifications</button>
 
+<button onclick={() => (showCreateForm = !showCreateForm)}>
+	{#if showCreateForm}
+		Hide Form
+	{:else}
+		Add a Todo
+	{/if}
+</button>
+
+{#if showCreateForm}
+	<Form action={`${page.route.id}?/addNewTodo`} method="POST" {formCallback}>
+		{@render formContent()}
+		<button> Add a Todo </button>
+	</Form>
+{/if}
+
 <MappedPetItems pets={data.pets || []} items={data.todos || []} {card} />
+
+{#snippet formContent(todo?: Todos)}
+	{#if todo}
+		<input type="hidden" name="id" value={todo.id} />
+	{/if}
+	<label>
+		Todo Title: 
+		<input type="text" name="title" value={todo?.title || ''} />
+	</label>
+	<label>
+		Due Date:
+		<input type="date" name="dueDate" value={todo?.dueDate} />
+	</label>
+	<label>
+		Due Time:
+		<input type="time" name="dueTime" value={todo?.dueTime} />
+	</label>
+	<label>
+		Done:
+		<input type="checkbox" name="complete" value={todo?.complete} />
+	</label>
+	<label>
+		Repeats:
+		<select name="repeats" value={todo?.repeats}>
+			{#each ['daily', 'weekly', 'monthly', 'yearly'] as cadence (cadence)}
+				<option value={cadence}>
+					{cadence}
+				</option>
+			{/each}
+		</select>
+	</label>
+	<label
+		>Label:
+		<input type="text" name="label" value={todo?.label} />
+	</label>
+	<label
+		>Notes:
+		<input type="textarea" name="notes" value={todo?.notes} />
+	</label>
+	{#if !todo}
+		<label>
+      For my pet:
+			<select name="petName">
+				{#each (data.pets || []).map(({ name }) => name || '') as option (option)}
+					<option>{option}</option>
+				{/each}
+			</select>
+		</label>
+	{/if}
+{/snippet}
 
 {#snippet card(pet: string, todos: Todos[])}
 	<div>
@@ -123,30 +161,15 @@
 				</button>
 
 				{#if showUpdateForm.has(todo.id)}
-					<Form
-						data={todo}
-						{...FormTypes.update}
-						fields={[{ type: 'hidden', name: 'id', value: String(todo.id) }, ...formFields]}
-						submitText="edit"
-						{formCallback}
-					/>
+					<Form action={`${page.route.id}?/updateTodo`} method="POST" {formCallback}>
+            {@render formContent(todo)}
+            <button aria-label="edit">edit</button>
+					</Form>
 				{/if}
 			</div>
 		{/each}
 	</div>
 {/snippet}
-
-<button onclick={() => (showCreateForm = !showCreateForm)}>
-	{#if showCreateForm}
-		Hide Form
-	{:else}
-		Add a Todo
-	{/if}
-</button>
-
-{#if showCreateForm}
-	<Form {...FormTypes.create} fields={formFields} submitText="Add a Todo" {formCallback} />
-{/if}
 
 <style>
 	div {
