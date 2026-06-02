@@ -76,8 +76,9 @@
 	{#if todo}
 		<input type="hidden" name="id" value={todo.id} />
 	{/if}
+
 	<label>
-		Todo Title: 
+		Todo Title:
 		<input type="text" name="title" value={todo?.title || ''} />
 	</label>
 	<label>
@@ -110,9 +111,10 @@
 		>Notes:
 		<input type="textarea" name="notes" value={todo?.notes} />
 	</label>
+
 	{#if !todo}
 		<label>
-      For my pet:
+			For my pet:
 			<select name="petName">
 				{#each (data.pets || []).map(({ name }) => name || '') as option (option)}
 					<option>{option}</option>
@@ -162,8 +164,8 @@
 
 				{#if showUpdateForm.has(todo.id)}
 					<Form action={`${page.route.id}?/updateTodo`} method="POST" {formCallback}>
-            {@render formContent(todo)}
-            <button aria-label="edit">edit</button>
+						{@render formContent(todo)}
+						<button aria-label="edit">edit</button>
 					</Form>
 				{/if}
 			</div>

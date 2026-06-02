@@ -1,29 +1,12 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import Form, { type FormFields } from '$lib/components/Form.svelte';
-	import type { HTMLFormAttributes } from 'svelte/elements';
+	import Form from '$lib/components/Form.svelte';
 
 	// not sure why i can't just put the string directly in the formFields obj.
 	// somehow svelte knows that this one is a Constant when typed like this.
 	let { data } = $props();
 	let showForm = $state(false);
-
-	const method: HTMLFormAttributes['method'] = 'POST';
-	const action = `${page.route.id}?/createPetProfile`;
-	const formFields: FormFields = {
-		action,
-		method,
-		submitText: 'create pet profile',
-		fields: [
-			{ label: 'name your pet', type: 'text', name: 'pet' },
-			{ label: 'What type of animal?', type: 'text', name: 'petType' },
-			{ label: 'pet age', type: 'text', name: 'age' },
-			{ label: 'date of birth', type: 'date', name: 'dob' },
-			{ label: 'weight', type: 'number', name: 'weight' },
-			{ type: 'hidden', name: 'userName' },
-		],
-	};
 </script>
 
 <h1>Pet Profiles</h1>
@@ -48,7 +31,32 @@
 	</button>
 
 	{#if showForm}
-		<Form {...formFields} />
+		<Form action={`${page.route.id}?/createPetProfile`} method="POST">
+			<input type="hidden" name="userName" value={data.user} />
+			<label
+				>name your pet
+				<input type="text" name="pet" />
+			</label>
+			<label
+				>What type of animal?
+				<input type="text" name="petType" />
+			</label>
+			<label
+				>pet age
+				<input type="text" name="age" />
+			</label>
+			<label
+				>date of birth
+				<input type="date" name="dob" />
+			</label>
+			<label
+				>weight
+				<input type="number" name="weight" />
+			</label>
+      <button aria-label="create pet profile">
+        create pet profile
+      </button>
+		</Form>
 	{/if}
 {:else}
 	<p><a href={resolve('/')}>Login or Register</a> to create and see your pet(s)!</p>

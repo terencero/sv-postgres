@@ -1,42 +1,40 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import Form from '$lib/components/Form.svelte';
-	import type { FormFields } from '$lib/components/Form.svelte';
 	import MappedPetItems from '$lib/components/MappedPetItems.svelte';
 	import { type PetSitters } from '$lib/server/db/schema.js';
 	import { SvelteSet } from 'svelte/reactivity';
 	import type { PageProps } from './$types';
 
-	let { data }: PageProps = $props();
+	let { data, form }: PageProps = $props();
 
 	let showCreateForm = $state(false);
 	let showUpdateForm = new SvelteSet<number>();
 
-	const FormTypes = {
-		create: {
-			method: 'POST',
-			action: `${page.route.id}?/addSitter`,
-		},
-		update: {
-			method: 'POST',
-			action: `${page.route.id}?/updateSitter`,
-		},
-	} as const;
-	let formFields: FormFields['fields'] = [
-		{ label: 'Sitter Dates', type: 'date', name: 'sitterDates' },
-		{ label: 'Sitter Name', type: 'text', name: 'sitterName' },
-		{ label: 'Sitter Phone Number', type: 'tel', name: 'sitterTel' },
-		{ label: 'Pet Sitting Location', type: 'text', name: 'petSittingLocation' },
-		{ label: 'Sitter Email', type: 'email', name: 'sitterEmail' },
-	];
-	const formCallback = () => {};
+	const formCallback = () => {
+		if (form?.success) {
+			if (form.actionType === 'updateSupply') {
+				showUpdateForm.delete(form.supplyId);
+			} else if (form.actionType === 'addSupply') {
+				showCreateForm = !showCreateForm;
+			}
+		}
+	};
 </script>
 
 <article>
 	<h1>Pet Sitting</h1>
 	<article>
 		<h2>Scheduled Sitters</h2>
-		<button>Add a Sitter</button>
+		<button></button>
+
+<button onclick={() => (showCreateForm = !showCreateForm)}>
+	{#if showCreateForm}
+		Hide Form
+	{:else}
+		Add a Sitter
+	{/if}
+</button>
 
 		{#if !data.pets || !data.petSitters.length}
 			'No Pets Have a Pet Sitter Reserved Yet.'
@@ -72,7 +70,37 @@
 			{/snippet}
 		{/if}
 	</article>
-	<Form fields={formFields} {...FormTypes.create} submitText="Add Sitter" {formCallback} />
+	<Form action={`${page.route.id}?/addSitter`} method="POST" {formCallback}>
+		<label>
+      Sitter Dates
+      <input type='date' name='sitterDates' />
+      </label>
+		<label>
+      Sitter Name
+      <input type='text' name='sitterName' />
+      </label>
+		<label>
+      Sitter Phone Number
+      <input type='tel' name='sitterTel' />
+      </label>
+		<label>
+      Pet Sitting Location
+      <input type='text' name='petSittingLocation' />
+      </label>
+		<label>
+      Sitter Email
+      <input type='email' name='sitterEmail' />
+      </label>
+    <label>
+      For:
+      <select name="petName">
+        {#each (data.pets || []).map(({ name }) => name || '') as option (option)}
+          <option>{option}</option>
+        {/each}
+      </select>
+    </label>
+    <button>Add Sitter</button>
+	</Form>
 </article>
 
 <style>

@@ -8,7 +8,7 @@
 		action: HTMLFormAttributes['action'];
 		method: HTMLFormAttributes['method'];
 		children: Snippet;
-		formCallback: () => void;
+		formCallback?: () => void;
 	}
 	let { children, action, method, formCallback }: Props = $props();
 
