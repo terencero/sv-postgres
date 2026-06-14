@@ -40,6 +40,7 @@
 			'No Pets Have a Pet Sitter Reserved Yet.'
 		{:else}
 			<MappedPetItems pets={data.pets || []} items={data.petSitters || []} {card} />
+
 			{#snippet card(pet: string, petSitters: PetSitters[] | [])}
 				{#each petSitters as sitter (sitter?.id)}
 					<article class="sitter-card">
@@ -70,7 +71,7 @@
 			{/snippet}
 		{/if}
 	</article>
-	<Form action={`${page.route.id}?/addSitter`} method="POST" {formCallback}>
+	<Form action={`${page.route.id}?/addNewPetSitter`} method="POST" {formCallback}>
 		<label>
       Sitter Dates
       <input type='date' name='sitterDates' />
