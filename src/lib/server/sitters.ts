@@ -1,3 +1,4 @@
+import { eq } from 'drizzle-orm';
 import { db } from './db';
 import { petSitters, type InsertPetSitters } from './db/schema';
 
@@ -16,5 +17,18 @@ export async function addPetSitter(params: InsertPetSitters) {
 	} catch (e) {
 		console.error(`error adding sitter: ${e}`);
 		throw new Error(`add pet sitter failed`);
+	}
+}
+
+export async function updatePetSitter(params: InsertPetSitters) {
+	try {
+		if (params.id === undefined || typeof params.id !== 'number') {
+			throw new Error('pet sitter id missing or incorrect type');
+		}
+
+		return await db.update(petSitters).set(params).where(eq(petSitters.id, params.id)).returning();
+	} catch (e) {
+		console.error(`error updating pet sitter: ${e}`);
+		throw new Error(`update pet sitter failed`);
 	}
 }

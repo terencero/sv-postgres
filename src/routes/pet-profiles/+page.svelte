@@ -53,9 +53,7 @@
 				>weight
 				<input type="number" name="weight" />
 			</label>
-      <button aria-label="create pet profile">
-        create pet profile
-      </button>
+			<button aria-label="create pet profile"> create pet profile </button>
 		</Form>
 	{/if}
 {:else}
