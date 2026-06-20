@@ -32,7 +32,7 @@ export const actions = {
 			sitterEndDate: String(data.get('sitterEndDate')),
 			sitterName: String(data.get('sitterName')),
 			sitterTel: String(data.get('sitterTel')),
-			petSittingLocation: String(data.get('petSittingLocation')),
+			sittingLocation: String(data.get('petSittingLocation')),
 			sitterEmail: String(data.get('sitterEmail')),
 			petName: String(data.get('petName')).toLowerCase(),
 		};
@@ -70,7 +70,7 @@ export const actions = {
 			sitterEndDate: String(data.get('sitterEndDate')),
 			sitterName: String(data.get('sitterName')),
 			sitterTel: String(data.get('sitterTel')),
-			petSittingLocation: String(data.get('petSittingLocation')),
+			sittingLocation: String(data.get('petSittingLocation')),
 			sitterEmail: String(data.get('sitterEmail')),
 			petName: String(data.get('petName')).toLowerCase(),
 		};

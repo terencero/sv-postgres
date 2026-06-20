@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { page } from '$app/state';
 	import Form from '$lib/components/Form.svelte';
 	import MappedPetItems from '$lib/components/MappedPetItems.svelte';
 	import { type PetSitters } from '$lib/server/db/schema.js';
@@ -11,7 +10,7 @@
 	let showCreateForm = $state(false);
 	let showUpdateForm = new SvelteSet<number>();
 
-	const handleEditClick = (sitterId: number) => {
+	const handleEditClick = (sitterId: number): void => {
 		if (showUpdateForm.has(sitterId)) {
 			showUpdateForm.delete(sitterId);
 		} else {
@@ -19,7 +18,7 @@
 		}
 	};
 
-	const formCallback = () => {
+	const formCallback = (): void => {
 		if (form?.success) {
 			if (form.actionType === 'updatePetSitter') {
 				showUpdateForm.delete(form.petSitterId);
