@@ -8,6 +8,9 @@
 	import MappedPetItems from '$lib/components/MappedPetItems.svelte';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { enhance } from '$app/forms';
+	import { CronJob } from 'cron';
+	import Notifications from '$lib/components/Notifications.svelte';
+	import { env } from '$env/dynamic/private';
 
 	let { data, form }: PageProps = $props();
 	let showCreateForm = $state(false);
@@ -32,6 +35,16 @@
 			showEnableNotification = false;
 
 			const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+      if (subscription) {
+        return subscription;
+      }
+      const subscribeOptions = {
+        userVisibleOnly: true,
+        // @ts-expect-error svelte doesn't have updated js types?
+        applicationlserverKey: Uint8Array.fromBase64(env.PUSH_PUBLIC_KEY, { alphabet: 'base64url' }),
+      };
+      const subscribed = registration.pushManager.subscribe(subscribeOptions);
 		} else {
 			// TODO: show the button to request permissions
 			showEnableNotification = true;
@@ -47,13 +60,24 @@
 			}
 		}
 	};
+
+  const handleNotify = async () => {
+    const permissionsRes = await Notification.requestPermission();
+    if (permissionsRes === 'granted') {
+      console.log(`permissionsRes: ${permissionsRes}`);
+      alert('granted!');
+    }
+  }
 </script>
 
 <h1>Todos</h1>
 
 <span>message from form data: {form?.description}</span>
 
-<button class={{ showEnableNotification }}>Enable Notifications</button>
+<button
+  class={{ showEnableNotification }}
+  onclick={handleNotify}
+>Enable Notifications</button>
 
 <button onclick={() => (showCreateForm = !showCreateForm)}>
 	{#if showCreateForm}

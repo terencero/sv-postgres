@@ -50,6 +50,7 @@
 	"dependencies": {
 		"@neondatabase/serverless": "^1.0.2",
 		"@node-rs/argon2": "^2.0.2",
-		"cron": "^4.4.0"
+		"cron": "^4.4.0",
+		"web-push": "^3.6.7"
 	}
 }
