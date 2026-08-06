@@ -6,6 +6,7 @@ import type { RequestEvent } from '../$types';
 
 export async function load() {
 	const supplies = await getSupplies();
+  console.log('supplies server load')
 
 	if (!supplies.length) {
 		error(404, {

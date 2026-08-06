@@ -3,6 +3,7 @@ import { getPet, getPets } from '$lib/server/pets';
 import type { InsertTodos } from '$lib/server/db/schema';
 import { error, fail } from '@sveltejs/kit';
 import type { RequestEvent } from './$types';
+import { CronJob } from 'cron';
 
 export async function load() {
 	const todos = await getTodos();
@@ -219,5 +220,13 @@ export const actions = {
 	},
 	setReminder() {
 		// TODO:reminders
+    const job = CronJob.from({
+      cronTime: '* * * * * *',
+      onTick: () => console.log('cron every sec'),
+    });
+    // job.start();
 	},
+  cancelReminder() {
+
+  }
 };

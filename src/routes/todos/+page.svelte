@@ -10,7 +10,7 @@
 	import { enhance } from '$app/forms';
 	import { CronJob } from 'cron';
 	import Notifications from '$lib/components/Notifications.svelte';
-	import { env } from '$env/dynamic/private';
+	import { env } from '$env/dynamic/public';
 
 	let { data, form }: PageProps = $props();
 	let showCreateForm = $state(false);
@@ -42,7 +42,7 @@
       const subscribeOptions = {
         userVisibleOnly: true,
         // @ts-expect-error svelte doesn't have updated js types?
-        applicationlserverKey: Uint8Array.fromBase64(env.PUSH_PUBLIC_KEY, { alphabet: 'base64url' }),
+        applicationlserverKey: Uint8Array.fromBase64(env.PUBLIC_PUSH_KEY, { alphabet: 'base64url' }),
       };
       const subscribed = registration.pushManager.subscribe(subscribeOptions);
 		} else {
@@ -67,6 +67,7 @@
       console.log(`permissionsRes: ${permissionsRes}`);
       alert('granted!');
     }
+    
   }
 </script>
 
