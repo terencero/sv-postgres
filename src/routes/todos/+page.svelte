@@ -35,16 +35,18 @@
 			showEnableNotification = false;
 
 			const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.getSubscription();
-      if (subscription) {
-        return subscription;
-      }
-      const subscribeOptions = {
-        userVisibleOnly: true,
-        // @ts-expect-error svelte doesn't have updated js types?
-        applicationlserverKey: Uint8Array.fromBase64(env.PUBLIC_PUSH_KEY, { alphabet: 'base64url' }),
-      };
-      const subscribed = registration.pushManager.subscribe(subscribeOptions);
+			const subscription = await registration.pushManager.getSubscription();
+			if (subscription) {
+				return subscription;
+			}
+			const subscribeOptions = {
+				userVisibleOnly: true,
+				// @ts-expect-error svelte doesn't have updated js types?
+				applicationlserverKey: Uint8Array.fromBase64(env.PUBLIC_PUSH_KEY, {
+					alphabet: 'base64url',
+				}),
+			};
+			const subscribed = registration.pushManager.subscribe(subscribeOptions);
 		} else {
 			// TODO: show the button to request permissions
 			showEnableNotification = true;
@@ -61,24 +63,20 @@
 		}
 	};
 
-  const handleNotify = async () => {
-    const permissionsRes = await Notification.requestPermission();
-    if (permissionsRes === 'granted') {
-      console.log(`permissionsRes: ${permissionsRes}`);
-      alert('granted!');
-    }
-    
-  }
+	const handleNotify = async () => {
+		const permissionsRes = await Notification.requestPermission();
+		if (permissionsRes === 'granted') {
+			console.log(`permissionsRes: ${permissionsRes}`);
+			alert('granted!');
+		}
+	};
 </script>
 
-<h1>Todos</h1>
+<h1 class="text-3xl">Todos</h1>
 
 <span>message from form data: {form?.description}</span>
 
-<button
-  class={{ showEnableNotification }}
-  onclick={handleNotify}
->Enable Notifications</button>
+<button class={{ showEnableNotification }} onclick={handleNotify}>Enable Notifications</button>
 
 <button onclick={() => (showCreateForm = !showCreateForm)}>
 	{#if showCreateForm}
@@ -150,10 +148,10 @@
 {/snippet}
 
 {#snippet card(pet: string, todos: Todos[])}
-	<div>
+	<div class="flex flex-col rounded-4xl border-2 border-solid border-cyan-500">
 		{pet}
 		{#each todos as todo (todo.id)}
-			<div id={`${String(todo.id)}-${todo.title}`}>
+			<div id={`${String(todo.id)}-${todo.title}`} class="rounded-2xl border border-cyan-200">
 				<form method="POST" action="?/completeTodo" use:enhance>
 					<input type="hidden" name="id" value={todo.id} />
 
@@ -172,7 +170,7 @@
 					<p><b>Label: </b>{todo.label}</p>
 					<p><b>Notes: </b>{todo.notes}</p>
 
-					<button aria-label="Mark Complete">Mark Complete</button>
+					<button class="p-1.5 rounded-full bg-emerald-100" aria-label="Mark Complete">Mark Complete</button>
 					<button onclick={() => handleReminder({ title: todo.title, dueDate: todo.dueDate })}
 						>remind me</button
 					>
@@ -180,7 +178,7 @@
 
 				<form method="POST" action="?/deleteTodo" use:enhance>
 					<input type="hidden" name="id" value={todo.id} />
-					<button aria-label="Delete">Delete</button>
+					<button class="rounded-full bg-cyan-200 p-1.5" aria-label="Delete">Delete</button>
 				</form>
 
 				<button onclick={() => handleEditClick(todo.id)}>
@@ -200,11 +198,6 @@
 
 <style>
 	div {
-		border: 0.2rem solid blue;
-		border-radius: 1.5%;
-		display: flex;
-		flex-direction: column;
-		gap: 0.2rem;
 		margin-bottom: 1rem;
 		padding: 1.5rem;
 		p {
