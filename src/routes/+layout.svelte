@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import favicon from '$lib/assets/favicon.svg';
+	import '../app.css';
 
 	let { children } = $props();
 </script>
@@ -16,6 +17,7 @@
 	<a href={resolve('/supplies')}>Pet Supplies</a>
 	<a href={resolve('/pet-sitting')}>Pet Sitting</a>
 </nav>
+
 <main>
 	{@render children()}
 </main>
