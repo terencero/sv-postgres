@@ -11,7 +11,7 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<nav>
+<nav class="rounded-full border border-white bg-sky-500/20 shadow-lg backdrop-blur-[1.5px]">
 	<a href={resolve('/')}>Home</a>
 	<a href={resolve('/todos')}>Todos</a>
 	<a href={resolve('/pet-profiles')}>My Pet(s)</a>
@@ -41,7 +41,6 @@
 		margin: 2rem 0 0;
 		padding: 0.5rem 0;
 		justify-content: space-evenly;
-		background-color: deepskyblue;
 	}
 	main {
 		padding: 1rem;

@@ -156,7 +156,7 @@
 					<input type="hidden" name="id" value={todo.id} />
 
 					<label>
-						<input type="checkbox" value={todo.title} />
+						<input type="checkbox" value={todo.title} class="rounded-full text-blue-500"/>
 						{todo.title}
 					</label>
 						<p><b>Due Date: </b>{todo.dueDate} {todo.dueTime} <b>Label: </b>{todo.label}</p>
