@@ -155,22 +155,15 @@
 				<form method="POST" action="?/completeTodo" use:enhance>
 					<input type="hidden" name="id" value={todo.id} />
 
-					<p><b>Title: </b>{todo.title}</p>
-					<p><b>Due Date: </b>{todo.dueDate} at {todo.dueTime}</p>
-					<p>
-						<b>Done: </b>
-						<input type="hidden" name="complete" value={!todo.complete} />
-						{#if todo.complete}
-							<img src={roundCheck} alt="round checkmark" />
-						{:else}
-							<img src={roundX} alt="round x mark" />
-						{/if}
-					</p>
-					<p><b>Repeats: </b>{todo.repeats || 'once'}</p>
-					<p><b>Label: </b>{todo.label}</p>
-					<p><b>Notes: </b>{todo.notes}</p>
+					<label>
+						<input type="checkbox" value={todo.title} />
+						{todo.title}
+					</label>
+						<p><b>Due Date: </b>{todo.dueDate} {todo.dueTime} <b>Label: </b>{todo.label}</p>
 
-					<button class="p-1.5 rounded-full bg-emerald-100" aria-label="Mark Complete">Mark Complete</button>
+					<button class="rounded-full bg-emerald-100 p-1.5" aria-label="Mark Complete"
+						>Mark Complete</button
+					>
 					<button onclick={() => handleReminder({ title: todo.title, dueDate: todo.dueDate })}
 						>remind me</button
 					>
