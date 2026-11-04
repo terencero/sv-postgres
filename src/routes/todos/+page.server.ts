@@ -107,9 +107,8 @@ export const actions = {
 	},
 	completeTodo: async ({ request }: RequestEvent) => {
 		const data = await request.formData();
-
 		const formFieldValues = {
-			complete: Boolean(data.get('complete')),
+			complete: data.get('complete') === 'on',
 			id: Number(data.get('id')),
 		};
 

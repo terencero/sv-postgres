@@ -154,19 +154,23 @@
 			<div id={`${String(todo.id)}-${todo.title}`} class="rounded-2xl border border-cyan-200">
 				<form method="POST" action="?/completeTodo" use:enhance>
 					<input type="hidden" name="id" value={todo.id} />
-
+					complete: {todo.complete}
 					<label>
-						<input type="checkbox" value={todo.title} class="rounded-full text-blue-500"/>
+						<input
+							onchange={(event) => event.currentTarget.form?.requestSubmit()}
+              name="complete"
+							type="checkbox"
+              checked={todo.complete}
+							value={!todo.complete && 'on' || 'off'}
+							class="rounded-full text-blue-500"
+						/>
 						{todo.title}
 					</label>
-						<p><b>Due Date: </b>{todo.dueDate} {todo.dueTime} <b>Label: </b>{todo.label}</p>
+					<p><b>Due Date: </b>{todo.dueDate} {todo.dueTime} <b>Label: </b>{todo.label}</p>
 
-					<button class="rounded-full bg-emerald-100 p-1.5" aria-label="Mark Complete"
-						>Mark Complete</button
-					>
-					<button onclick={() => handleReminder({ title: todo.title, dueDate: todo.dueDate })}
-						>remind me</button
-					>
+					<!-- <button onclick={() => handleReminder({ title: todo.title, dueDate: todo.dueDate })}> -->
+					<!-- 	remind me -->
+					<!-- </button> -->
 				</form>
 
 				<form method="POST" action="?/deleteTodo" use:enhance>

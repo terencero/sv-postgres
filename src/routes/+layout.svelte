@@ -12,11 +12,11 @@
 </svelte:head>
 
 <nav class="rounded-full border border-white bg-sky-500/20 shadow-lg backdrop-blur-[1.5px]">
-	<a href={resolve('/')}>Home</a>
-	<a href={resolve('/todos')}>Todos</a>
-	<a href={resolve('/pet-profiles')}>My Pet(s)</a>
-	<a href={resolve('/supplies')}>Pet Supplies</a>
-	<a href={resolve('/pet-sitting')}>Pet Sitting</a>
+	<a href={resolve('/')}><span class="icon-[lucide--house-heart]"></span></a>
+	<a href={resolve('/todos')}><span class="icon-[lucide--list-todo]"></span></a>
+	<a href={resolve('/pet-profiles')}><span class="icon-[lucide--paw-print]"></span></a>
+	<a href={resolve('/supplies')}><span class="icon-[lucide--shelving-unit]"></span></a>
+	<a href={resolve('/pet-sitting')}><span class="icon-[iconoven--pet-family]"></span></a>
 </nav>
 
 <main>
